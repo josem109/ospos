@@ -99,24 +99,23 @@ if(isset($success))
 				</li>
 			</ul>
 		</div>
+		<!-- Pinto 08/28/2023 -->		
+		<p>Tasa de cambio BCV: <span id="tasa_cambio">
+				<?php echo($this->config->item('currency_rate')); 
+					$currency_rate = floatval($this->config->item('currency_rate'));
+				?>
+		
+			</span>
+
+		</p>
+		<!-- End Pinto 08/28/2023 -->		
 	<?php echo form_close(); ?>
 
 
 <!-- Sale Items List -->
 
 </script>
-	<p>Tasa de cambio BCV: <span id="tasa_cambio">
-		<?php 
-				echo htmlspecialchars(file_get_contents('C:\xampp\htdocs\ospos\application\views\sales\config.txt')); 
-				/*if (file_exists('C:\xampp\htdocs\ospos\application\views\sales\config.txt')) {
-				    echo "El archivo existe.";
-				} else {
-				    echo "El archivo no existe.";
-				}*/
-		?>
-			</span>
 
-	</p>
 	<table class="sales_table_100" id="register">
 		<thead>
 			<tr>
@@ -200,21 +199,9 @@ if(isset($success))
 								<?php
 								if($items_module_allowed && $change_price)
 								{
-									$tasa_cambio_file_path = 'C:\xampp\htdocs\ospos\application\views\sales\config.txt';
-									if (file_exists($tasa_cambio_file_path)) {
-									    $tasa_cambio_file = file_get_contents($tasa_cambio_file_path);
-									    if ($tasa_cambio_file !== false) {
-									        $tasa_cambio = floatval(htmlspecialchars($tasa_cambio_file));
-									    } else {
-									        echo "No se pudo leer el archivo de tasa de cambio.";
-									    }
-									} else {
-									    echo "El archivo de tasa de cambio no existe en la ruta especificada.";
-									}
-
 									$precio = $item['price'];
-									//$precio_multiplicado = $precio * 33;
-									$precio_multiplicado = $precio * $tasa_cambio;
+									$precio_multiplicado = $precio * $currency_rate;
+									
 									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
 
 								}
@@ -485,7 +472,7 @@ if(isset($success))
 			<!-- Pinto 22/08/2023 -->
 			<tr>
 				<th style="width: 55%; font-size: 150%"><?php echo $this->lang->line('total_ves'); ?></th>
-				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency($tasa_cambio * $total); ?></span></th>
+				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency($total); ?></span></th>
 			</tr>
 			<!-- Fin Pinto 22/08/2023 -->
 		</table>

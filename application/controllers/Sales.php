@@ -382,7 +382,9 @@ class Sales extends Secure_Controller
 
 		$discount = $this->config->item('default_sales_discount');
 		$discount_type = $this->config->item('default_sales_discount_type');
-
+		//Pinto 08/28/2023
+		$currency_rate = $this->config->item('currency_rate');
+		//End Pinto 08/28/2023
 		// check if any discount is assigned to the selected customer
 		$customer_id = $this->sale_lib->get_customer();
 		if($customer_id != -1)
@@ -474,7 +476,9 @@ class Sales extends Secure_Controller
 	public function edit_item($item_id)
 	{
 		$data = array();
-
+		//Pinto 08/28/2023
+		//$currency_rate = $this->config->item('currency_rate');
+		//End Pinto 08/28/2023
 		$this->form_validation->set_rules('price', 'lang:sales_price', 'required|callback_numeric');
 		$this->form_validation->set_rules('quantity', 'lang:sales_quantity', 'required|callback_numeric');
 		$this->form_validation->set_rules('discount', 'lang:sales_discount', 'required|callback_numeric');
@@ -482,6 +486,7 @@ class Sales extends Secure_Controller
 		$description = $this->input->post('description');
 		$serialnumber = $this->input->post('serialnumber');
 		$price = parse_decimals($this->input->post('price'));
+		//$price = 42;
 		$quantity = parse_quantity($this->input->post('quantity'));
 		$discount_type = $this->input->post('discount_type');
 		$discount = $discount_type ? parse_quantity($this->input->post('discount')) : parse_decimals($this->input->post('discount'));
@@ -497,6 +502,7 @@ class Sales extends Secure_Controller
 		}
 		else
 		{
+
 			$data['error'] = $this->lang->line('sales_error_editing_item');
 		}
 
