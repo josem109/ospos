@@ -997,8 +997,7 @@ class Sale_lib
 			{
 				$line['discount_type'] = $discount_type;
 			}
-			//$line['price'] = $price;
-			$line['price'] = 35;
+			$line['price'] = $price;
 			$line['total'] = $this->get_item_total($quantity, $price, $discount, $line['discount_type']);
 			$line['discounted_total'] = $this->get_item_total($quantity, $price, $discount, $line['discount_type'], TRUE);
 			$this->set_cart($items);
