@@ -1,0 +1,41 @@
+{
+
+  "version": "0.2.0",
+ 
+  "configurations": [
+ 
+    {
+ 
+      "name": "Listen for XDebug",
+ 
+      "type": "php",
+ 
+      "request": "launch",
+ 
+      "port": 9000,
+ 
+      "pathMappings": {
+ 
+        "C:/xampp/htdocs/ospos": "${workspaceFolder:ospos}"
+ 
+      },
+ 
+      "xdebugSettings": {
+ 
+        "show_hidden": 1
+ 
+      }
+ 
+    }
+ 
+  ]
+ 
+ }
+ 
+ /path/to/drupal/webroot se reemplaza por la ruta a la carpeta raíz del  proyecto, y webroot por el nombre de la carpeta del mismo, en este caso  quedaría de la siguiente manera:
+ 
+ "pathMappings": {
+ 
+   “/usr/share/nginx/html/raiz/atomic”: "${workspaceFolder:atomic}"
+ 
+ },

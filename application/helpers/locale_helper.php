@@ -352,15 +352,15 @@ function to_currency($number)
 	return to_decimals($number, 'currency_decimals', \NumberFormatter::CURRENCY);
 }
 
-/*function to_currency_bcv($number)
+function to_currency_bcv($number)
 {
 	$fmt = new NumberFormatter( 'es_VE', NumberFormatter::CURRENCY );
 	return $fmt->formatCurrency($number, 'VES')."\n";
-}*/
+}
 
 function to_currency_no_money($number)
 {
-	return to_decimals($number, 'currency_decimals', \NumberFormatter::CURRENCY);
+	return to_decimals($number, 'currency_decimals');
 }
 
 function to_currency_tax($number)

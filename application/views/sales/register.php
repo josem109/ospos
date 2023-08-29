@@ -100,13 +100,12 @@ if(isset($success))
 			</ul>
 		</div>
 		<!-- Pinto 08/28/2023 -->		
-		<p>Tasa de cambio BCV: <span id="tasa_cambio">
+		<p>Tasa de cambio BCV: <span id="tasa_cambio">-->
 				<?php echo($this->config->item('currency_rate')); 
 					$currency_rate = floatval($this->config->item('currency_rate'));
 				?>
 		
 			</span>
-
 		</p>
 		<!-- End Pinto 08/28/2023 -->		
 	<?php echo form_close(); ?>
@@ -184,7 +183,7 @@ if(isset($success))
 								<?php
 								if($items_module_allowed && $change_price)
 								{
-									echo form_input(array('name'=>'price', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($item['price']), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));
+									echo form_input(array('name'=>'price', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($item['price']), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));	
 								}
 								else
 								{
@@ -199,16 +198,15 @@ if(isset($success))
 								<?php
 								if($items_module_allowed && $change_price)
 								{
-									$precio = $item['price'];
-									$precio_multiplicado = $precio * $currency_rate;
+									$precio_multiplicado = $item['price'] * $currency_rate;
 									
-									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
+									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'style'=>'font-size: 10px', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
 
 								}
 								else
 								{
-									echo to_currency($item['price']);
-									echo form_hidden('price', to_currency_no_money($item['price']));
+									/*echo to_currency($item['price']);
+									echo form_hidden('price_converted', to_currency_no_money($item['price']));*/
 								}
 								?>
 							</td>
@@ -472,7 +470,7 @@ if(isset($success))
 			<!-- Pinto 22/08/2023 -->
 			<tr>
 				<th style="width: 55%; font-size: 150%"><?php echo $this->lang->line('total_ves'); ?></th>
-				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency($total); ?></span></th>
+				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency_bcv($currency_rate*$total); ?></span></th>
 			</tr>
 			<!-- Fin Pinto 22/08/2023 -->
 		</table>
