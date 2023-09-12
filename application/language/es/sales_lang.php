@@ -5,6 +5,7 @@ $lang["rewards_remaining_balance"] = "El remanente de puntos es ";
 $lang["sales_account_number"] = "Cuenta #";
 $lang["sales_add_payment"] = "Agregar Pago";
 $lang["sales_amount_due"] = "Monto Adeudado";
+$lang["sales_amount_due_ves"] = "Monto Adeudado VES";
 $lang["sales_amount_tendered"] = "Cantidad Recibida";
 $lang["sales_authorized_signature"] = "Firma Autorizada";
 $lang["sales_cancel_sale"] = "Cancelar Venta";

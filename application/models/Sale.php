@@ -901,6 +901,7 @@ class Sale extends CI_Model
 	 */
 	public function get_sale_items_ordered($sale_id)
 	{
+		//Cambio Jpinto
 		$this->db->select('
 			sales_items.sale_id,
 			sales_items.item_id,
@@ -914,7 +915,7 @@ class Sale extends CI_Model
 			discount_type,
 			item_location,
 			print_option,
-			' . $this->Item->get_item_name('name') . ',
+			name,
 			category,
 			item_type,
 			stock_type');
@@ -1155,7 +1156,7 @@ class Sale extends CI_Model
 				GROUP BY payments.sale_id
 			)'
 		);
-
+//JPINTO
 		$this->db->query('CREATE TEMPORARY TABLE IF NOT EXISTS ' . $this->db->dbprefix('sales_items_temp') .
 			' (INDEX(sale_date), INDEX(sale_time), INDEX(sale_id))
 			(
@@ -1178,7 +1179,7 @@ class Sale extends CI_Model
 					MAX(sales.employee_id) AS employee_id,
 					MAX(CONCAT(employee.first_name, " ", employee.last_name)) AS employee_name,
 					items.item_id AS item_id,
-					MAX(' . $this->Item->get_item_name() . ')AS name,
+					items.name AS name,
 					MAX(items.item_number) AS item_number,
 					MAX(items.category) AS category,
 					MAX(items.supplier_id) AS supplier_id,

@@ -1,6 +1,7 @@
 <?php
 $lang["customers_available_points"] = "Puntos Disponibles";
 $lang["price_ves"] = "Precio VES";
+$lang["sales_amount_due_ves"] = "Monto Adeudado VES";
 $lang["rewards_package"] = "Premios";
 $lang["rewards_remaining_balance"] = "Puntos de recompensa sobrante son: ";
 $lang["sales_account_number"] = "Cuenta #";
