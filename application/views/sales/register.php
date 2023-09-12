@@ -489,6 +489,12 @@ if(isset($success))
 					<th style="width: 55%; font-size: 120%"><?php echo $this->lang->line('sales_amount_due'); ?></th>
 					<th style="width: 45%; font-size: 120%; text-align: right;"><span id="sale_amount_due"><?php echo to_currency($amount_due); ?></span></th>
 				</tr>
+				 <!-- Pinto 11/09/2023-->
+				 <tr>
+					<th style="width: 55%; font-size: 120%"><?php echo $this->lang->line('sales_amount_due_ves'); ?></th>
+					<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_amount_due"><?php echo to_currency_bcv($currency_rate*$amount_due); ?></span></th>
+				</tr>
+				<!-- Pinto 11/09/2023-->
 			</table>
 
 			<div id="payment_details">

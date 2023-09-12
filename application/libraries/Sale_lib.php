@@ -1066,7 +1066,7 @@ class Sale_lib
 		{
 			$this->add_item($row->item_id, $row->quantity_purchased, $row->item_location, $row->discount, $row->discount_type, PRICE_MODE_STANDARD, NULL, NULL, $row->item_unit_price, $row->description, $row->serialnumber, $sale_id, TRUE, $row->print_option);
 		}
-
+	
 		$this->CI->session->set_userdata('cash_mode', CASH_MODE_FALSE);
 
 		// Establish cash_mode for this sale by inspecting the payments

@@ -15,8 +15,9 @@ class Inventory_low extends Report
 	}
 
 	public function getData(array $inputs)
-	{
-		$query = $this->db->query("SELECT " . $this->Item->get_item_name('name') . ", 
+	{	
+		//jpinto
+		$query = $this->db->query("SELECT items.name, 
 			items.item_number,
 			item_quantities.quantity, 
 			items.reorder_level, 
