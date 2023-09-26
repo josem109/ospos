@@ -55,8 +55,8 @@
 		<tr>
 			<th style="width:40%;"><?php echo $this->lang->line('sales_description_abbrv'); ?></th>
 			<th style="width:20%;"><?php echo $this->lang->line('sales_price'); ?></th>
-			<th style="width:20%;"><?php echo $this->lang->line('sales_quantity'); ?></th>
-			<th style="width:20%;" class="total-value"><?php echo $this->lang->line('sales_total'); ?></th>
+			<th style="width:10%;"><?php echo $this->lang->line('sales_quantity'); ?></th>
+			<th style="width:30%;" class="total-value"><?php echo $this->lang->line('sales_total'); ?></th>
 			<?php
 			if($this->config->item('receipt_show_tax_ind'))
 			{
@@ -136,10 +136,10 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
-				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency($prediscount_subtotal); ?></td>
+				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency($prediscount_subtotal); ?></td>
 			</tr>
 			<tr>
-				<td colspan="3" class="total-value"><?php echo $this->lang->line('sales_customer_discount'); ?>:</td>
+				<td colspan="3" style='text-align:right'><?php echo $this->lang->line('sales_customer_discount'); ?>:</td>
 				<td class="total-value"><?php echo to_currency($discount * -1); ?></td>
 			</tr>
 		<?php
@@ -152,7 +152,7 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
-				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency($subtotal); ?></td>
+				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency($subtotal); ?></td>
 			</tr>
 			<?php
 			foreach($taxes as $tax_group_index=>$tax)
@@ -175,7 +175,7 @@
 		<?php $border = (!$this->config->item('receipt_show_taxes') && !($this->config->item('receipt_show_total_discount') && $discount > 0)); ?>
 		<tr>
 			<td colspan="3" style="text-align:right;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo $this->lang->line('sales_total'); ?></td>
-			<td style="text-align:right;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency($total); ?></td>
+			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency($total); ?></td>
 		</tr>
 
 		<tr>
