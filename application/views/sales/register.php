@@ -136,7 +136,7 @@ if(isset($success))
 			{
 			?>
 				<tr>
-					<td colspan='8'>
+					<td colspan='12'>
 						<div class='alert alert-dismissible alert-info'><?php echo $this->lang->line('sales_no_items_in_cart'); ?></div>
 					</td>
 				</tr>
