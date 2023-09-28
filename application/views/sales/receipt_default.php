@@ -224,8 +224,8 @@
 		//?php echo nl2br($this->config->item('return_policy')); ?>
 	</div> -->
 
-<!-- 	<div id="barcode">
-		<img src='data:image/png;base64,?php echo $barcode; ?>' /><br>
-		?php echo $sale_id; ?>
-	</div> -->
+	<div id="barcode">
+		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
+		<?php echo $sale_id; ?>
+	</div>
 </div>
