@@ -55,7 +55,7 @@
 		<tr>
 			<th style="width:40%;"><?php echo $this->lang->line('sales_description_abbrv'); ?></th>
 			<th style="width:20%;"><?php echo $this->lang->line('sales_price'); ?></th>
-			<th style="width:10%;"><?php echo $this->lang->line('sales_quantity'); ?></th>
+			<th style="width:10%;"><?php echo $this->lang->line('sales_quantity_receipt'); ?></th>
 			<th style="width:30%;" class="total-value"><?php echo $this->lang->line('sales_total'); ?></th>
 			<?php
 			if($this->config->item('receipt_show_tax_ind'))
@@ -224,8 +224,8 @@
 		//?php echo nl2br($this->config->item('return_policy')); ?>
 	</div> -->
 
-	<div id="barcode">
-		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
-		<?php echo $sale_id; ?>
-	</div>
+<!-- 	<div id="barcode">
+		<img src='data:image/png;base64,?php echo $barcode; ?>' /><br>
+		?php echo $sale_id; ?>
+	</div> -->
 </div>

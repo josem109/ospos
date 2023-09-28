@@ -146,6 +146,7 @@ $lang["sales_payments_total"] = "Pagado";
 $lang["sales_price"] = "Precio";
 $lang["sales_print_after_sale"] = "Imprimir recibo después de una venta";
 $lang["sales_quantity"] = "Cantidad";
+$lang["sales_quantity_receipt"] = "Cant.";
 $lang["sales_quantity_less_than_reorder_level"] = "Advertencia. La cantidad deseada es insuficiente.";
 $lang["sales_quantity_less_than_zero"] = "Advertencia. La cantidad deseada no tiene stock suficiente. Puedes procesar la venta pero revisa tu inventario.";
 $lang["sales_quantity_of_items"] = "Cantidad de %1 articulos";
