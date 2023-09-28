@@ -1,14 +1,25 @@
 <?php
+// Obtiene la ruta del archivo actual
+$current_file_path = __FILE__;
 
+// Obtiene la ruta de la carpeta log al mismo nivel del archivo actual
+$log_folder_path = dirname($current_file_path) . '/log';
+
+// Define el nombre y la ubicación del archivo de registro
+$log_file = $log_folder_path . '/archivo.log';
+
+// Habilita el registro de errores en PHP
+ini_set('log_errors', 1);
+ini_set('error_log', $log_file);
 // Define las variables de conexión a las bases de datos locales y remotas
 $host_local = "localhost";
 $username_local = "root";
 $password_local = "";
 $database_local = "ospos";
 
-$host_remote = "45.154.57.16";
+$host_remote = "172.67.130.187";
 $username_remote = "integracion";
-$password_remote = "!hh1Y1j24";
+$password_remote = "8xwFs18?1";
 $database_remote = "integracion";
 
 // Conecta a la base de datos local
@@ -52,7 +63,8 @@ $statement_local->bindParam(':max_date', $max_date);
 $statement_local->execute();
 $result_local = $statement_local->fetchAll();
 
-
+// Escribe los resultados en el archivo de registro
+error_log(print_r($result_local, true));
 
 // Conecta a la base de datos remota
 $connection_remote = new PDO("mysql:host=$host_remote;dbname=$database_remote", $username_remote, $password_remote);
