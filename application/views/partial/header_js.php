@@ -1,7 +1,60 @@
 <script type="text/javascript">
+	function obtener_valor_dolar(url) {
+    // Obtener el contenido de la página web
+	
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            // Buscar el valor del campo utilizando una expresión regular
+            const pattern = `/<div id="dolar".*?<strong>(.*?)<\/strong>/s`;
+            const matches = html.match(pattern);
+			alert('Continua');
+            if (matches) {
+                const valor = matches[1];
+                console.log(valor);
+				alert(valor);
+            } else {
+				
+                console.log('No se encontró el campo en la página web.');
+            }
+        })
+        .catch(error => console.log(error));
+}
+		//Refresh Page at 7AM
+		function actualizarPagina() {
+  			let ahora = new Date();
+  			let hora = ahora.getHours();
+  			let minuto = ahora.getMinutes();
+  			let segundo = ahora.getSeconds();
+  if (hora == 0 && minuto == 14 && segundo == 00) {
+	//obtener_valor_dolar('https://www.bcv.org.ve/');
+	alert('antes');
+	jQuery.ajax({
+    type: "POST",
+    url: 'http://localhost/ospos/public/dolar.php',
+    dataType: 'json',
+    data: {functionname: 'getDolar'},
+
+    success: function (obj, textstatus) {
+                  if( !('error' in obj) ) {
+                      yourVariable = obj.result;
+					  alert(obj.result);
+                  }
+                  else {
+                      console.log(obj.error);
+					  alert(obj.error);
+                  }
+            }
+});
+     location.reload();
+  } else {
+    setTimeout(actualizarPagina, 1000);
+  }
+}
 	// live clock
 	var clock_tick = function clock_tick() {
 		setInterval('update_clock();', 1000);
+		actualizarPagina();
 	}
 
 	// start the clock immediatly

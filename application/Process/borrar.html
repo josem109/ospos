@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Actualizar valor del dólar automáticamente</title>
+    <meta http-equiv="refresh" content="60" />
+  </head>
+  <body>
+    <div id="dolar" class="col-sm-12 col-xs-12">
+      <div class="field-content">
+        <div class="row recuadrotsmc">
+          <div class="col-sm-6 col-xs-6">
+            <img
+              src="/sites/default/files/dollar-04_2.png"
+              class="icono_bss_blanco1"
+            />
+            <span> USD</span>
+          </div>
+          <div class="col-sm-6 col-xs-6 centrado">
+            <strong id="valor">35</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function actualizarValor() {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("GET", "https://www.bcv.org.ve/", true);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            var valor = xhr.responseText;
+            document.getElementById("valor").textContent = 33;
+          }
+        };
+        xhr.send();
+      }
+
+      actualizarValor();
+      setInterval(actualizarValor, 10000); // Actualizar cada 60 segundos
+
+      setTimeout(function () {
+        alert("Han pasado 60 segundos.");
+      }, 10000);
+    </script>
+  </body>
+</html>
