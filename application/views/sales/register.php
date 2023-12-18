@@ -1,7 +1,26 @@
 <?php $this->load->view("partial/header"); ?>
+<script>
+        $(document).ready(function() {
+	
 
+
+        
+            $('#refresh_bcv_button').click(function() {
+				$("#miAlerta").show();
+				event.preventDefault();
+				//window.location.href = 'http://localhost/ospos/public/sales';
+                actualizarPaginaBoton();
+				//window.location.href = 'http://localhost/ospos/public/sales';
+				//alert('Se ha actualizado la tasa de cambio!');
+				//location.reload();
+            });
+        });
+    </script>
 <?php
-
+echo '
+<div id="miAlerta" style="display: none; position: fixed; width: 100%; height: 100%; top: 0; left: 0; background: rgba(0,0,0,0.5); color: white; text-align: center; padding-top: 20%; z-index: 9999;">
+    ¡Tasa de Cambio se está Actualizando!
+</div>';
 if(isset($error))
 {
 	echo "<div class='alert alert-dismissible alert-danger'>".$error."</div>";
@@ -97,6 +116,12 @@ if(isset($success))
 						<span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_new_item'); ?>
 					</button>
 				</li>
+				<li class="pull-right">
+					<button id="refresh_bcv_button" class='btn btn-info btn-sm pull-right'>
+						<span class="glyphicon glyphicon-usd">&nbsp</span><?php echo $this->lang->line('refresh_currency'); ?>
+					</button>
+					
+				</li>
 			</ul>
 		</div>
 		<!-- Pinto 08/28/2023 -->		
@@ -104,8 +129,7 @@ if(isset($success))
 				<?php echo($this->config->item('currency_rate')); 
 					$currency_rate = floatval($this->config->item('currency_rate'));
 				?>
-		
-			</span>
+				</span>
 		</p>
 		<!-- End Pinto 08/28/2023 -->		
 	<?php echo form_close(); ?>
