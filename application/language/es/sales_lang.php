@@ -1,5 +1,6 @@
 <?php
 $lang["customers_available_points"] = "Puntos Disponibles";
+$lang["refresh_currency"] = "Refrescar Tasa";
 $lang["rewards_package"] = "Premios";
 $lang["rewards_remaining_balance"] = "El remanente de puntos es ";
 $lang["sales_account_number"] = "Cuenta #";

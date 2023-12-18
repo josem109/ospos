@@ -30,6 +30,7 @@ Options +ExecCGI +Includes +IncludesNOEXEC +SymLinksIfOwnerMatch -Indexes
   Header set X-Content-Type-Options "nosniff"
   Header set X-XSS-Protection "1; mode=block"
   Header set X-Frame-Options "DENY"
+ #Header set Content-Security-Policy "script-src 'self' https://ajax.googleapis.com 'unsafe-inline' 'unsafe-eval'"
 </Ifmodule>
 
 # prevent folder listing

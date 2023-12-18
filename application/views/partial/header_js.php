@@ -20,36 +20,97 @@
         })
         .catch(error => console.log(error));
 }
-		//Refresh Page at 7AM
-		function actualizarPagina() {
-  			let ahora = new Date();
-  			let hora = ahora.getHours();
-  			let minuto = ahora.getMinutes();
-  			let segundo = ahora.getSeconds();
-  if (hora == 0 && minuto == 14 && segundo == 00) {
+function actualizarPaginaBoton() {
+	try{
+	
 	//obtener_valor_dolar('https://www.bcv.org.ve/');
-	alert('antes');
 	jQuery.ajax({
     type: "POST",
-    url: 'http://localhost/ospos/public/dolar.php',
+    url: 'http://localhost/ospos/public/dolarpost.php',
     dataType: 'json',
     data: {functionname: 'getDolar'},
-
     success: function (obj, textstatus) {
-                  if( !('error' in obj) ) {
+		//alert('Solicitud AJAX realizada.');
+				  //alert('exito');
+		          if( !('error' in obj) ) {
                       yourVariable = obj.result;
 					  alert(obj.result);
+					  $("#miAlerta").hide();
+					  location.reload();
+					  window.location.href = 'http://localhost/ospos/public/sales';
                   }
                   else {
                       console.log(obj.error);
 					  alert(obj.error);
                   }
-            }
-});
+            },
+    error: function (jqXHR, textStatus, errorThrown) {
+		//alert('Solicitud AJAX error.');
+        // Este bloque de código se ejecutará si la solicitud AJAX falla
+        console.log('Error: ' + textStatus + ' ' + errorThrown);
+        //alert('Ha ocurrido un error al realizar la solicitud.');
+    }
+   });
+    
+   //alert('Se ha actualizado la tasa de cambio!');
+     //location.reload();
+ 
+}//end try
+ catch (error) {
+        console.log('Ha ocurrido un error: ', error);
+		alert('error');
+        // Maneja el error aquí...
+    }
+}
+		//Refresh Page at 7AM
+function actualizarPagina() {
+	try{
+		
+  			let ahora = new Date();
+  			let hora = ahora.getHours();
+  			let minuto = ahora.getMinutes();
+  			let segundo = ahora.getSeconds();
+		
+  if (hora == 16 && minuto == 05 && segundo == 00) {
+	
+	//obtener_valor_dolar('https://www.bcv.org.ve/');
+	jQuery.ajax({
+    type: "POST",
+    url: 'http://localhost/ospos/public/dolarpost.php',
+    dataType: 'json',
+    data: {functionname: 'getDolar'},
+    success: function (obj, textstatus) {
+		//alert('Solicitud AJAX realizada.');
+				  //alert('exito');
+		          if( !('error' in obj) ) {
+                      yourVariable = obj.result;
+					  //alert(obj.result);
+					  
+                  }
+                  else {
+                      console.log(obj.error);
+					  alert(obj.error);
+                  }
+            },
+    error: function (jqXHR, textStatus, errorThrown) {
+		//alert('Solicitud AJAX error.');
+        // Este bloque de código se ejecutará si la solicitud AJAX falla
+        console.log('Error: ' + textStatus + ' ' + errorThrown);
+        //alert('Ha ocurrido un error al realizar la solicitud.');
+    }
+   });
+    alert('Se ha actualizado la tasa de cambio!');
+
      location.reload();
   } else {
     setTimeout(actualizarPagina, 1000);
   }
+}//end try
+ catch (error) {
+        console.log('Ha ocurrido un error: ', error);
+		alert('error');
+        // Maneja el error aquí...
+    }
 }
 	// live clock
 	var clock_tick = function clock_tick() {

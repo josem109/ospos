@@ -13,7 +13,7 @@ class Login extends CI_Controller
 		else
 		{
 			$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
-
+			
 			$this->form_validation->set_rules('username', 'lang:login_username', 'required|callback_login_check');
 
 			if($this->form_validation->run() == FALSE)
@@ -29,6 +29,7 @@ class Login extends CI_Controller
 
 	public function login_check($username)
 	{
+		
 		if(!$this->installation_check())
 		{
 			$this->form_validation->set_message('login_check', $this->lang->line('login_invalid_installation'));
@@ -44,11 +45,11 @@ class Login extends CI_Controller
 		}
 
 		$password = $this->input->post('password');
-
+		
 		if(!$this->Employee->login($username, $password))
 		{
 			$this->form_validation->set_message('login_check', $this->lang->line('login_invalid_username_and_password'));
-
+			
 			return FALSE;
 		}
 
@@ -63,7 +64,22 @@ class Login extends CI_Controller
 				return FALSE;
 			}
 		}
+		error_log("El usuario $username ha iniciado sesión con éxito.");
 
+				// Configura las opciones de cURL
+				$ch = curl_init();
+				curl_setopt($ch, CURLOPT_URL, "http://localhost/ospos/public/dolarpost.php");
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('functionname' => 'getDolar')));
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		
+				// Ejecuta la solicitud
+				$response = curl_exec($ch);
+		
+				// Cierra cURL
+				curl_close($ch);
+		
+				// Ahora puedes manejar la respuesta...
 		return TRUE;
 	}
 
