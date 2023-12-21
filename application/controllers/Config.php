@@ -398,6 +398,29 @@ class Config extends Secure_Controller
 
 		$result = $this->Appconfig->batch_save($batch_save_data);
 		$success = $result ? TRUE : FALSE;
+		
+		// Obtiene los valores que necesitas para CurrencyTable
+		$currency_rate = $this->input->post('currency_rate');
+		$currency_symbol = $this->input->post('currency_symbol');
+		
+		// Verifica si los valores necesarios están presentes
+		if (empty($currency_rate) || empty($currency_symbol)) {
+			// Maneja el error aquí, por ejemplo, muestra un mensaje de error al usuario
+			echo "Error: Los valores de currency_rate y currency_symbol son necesarios.";
+			return;
+		}
+		
+		$currency_date = date('Y-m-d'); // Usa la fecha actual
+		
+		// Carga el modelo CurrencyTable
+		$this->load->model('Currency');
+		// Intenta guardar la tasa de cambio
+		if (!$this->Currency->save_currency_rate($currency_rate, $currency_symbol, $currency_date)) {
+			// Si save_currency_rate devuelve false, entonces hubo un error
+			echo "Error: No se pudo guardar la tasa de cambio.";
+			return;
+		}  
+		
 
 		echo json_encode(array(
 			'success' => $success,

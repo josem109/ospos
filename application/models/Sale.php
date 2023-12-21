@@ -228,6 +228,30 @@ class Sale extends CI_Model
 			$this->db->group_end();
 		}
 
+		if($filters['only_bs'] != FALSE)
+		{
+			$this->db->group_start();
+				$this->db->like('payments.payment_type', $this->lang->line('sales_cash_bs'));
+				$this->db->or_where('payments.payment_type IS NULL');
+			$this->db->group_end();
+		}
+
+		if($filters['only_zelle'] != FALSE)
+		{
+			$this->db->group_start();
+				$this->db->like('payments.payment_type', $this->lang->line('sales_zelle'));
+				$this->db->or_where('payments.payment_type IS NULL');
+			$this->db->group_end();
+		}
+
+		if($filters['only_movil'] != FALSE)
+		{
+			$this->db->group_start();
+				$this->db->like('payments.payment_type', $this->lang->line('sales_pago_movil'));
+				$this->db->or_where('payments.payment_type IS NULL');
+			$this->db->group_end();
+		}
+
 		if($filters['only_creditcard'] != FALSE)
 		{
 			$this->db->like('payments.payment_type', $this->lang->line('sales_credit'));
@@ -330,6 +354,21 @@ class Sale extends CI_Model
 		if($filters['only_cash'] != FALSE)
 		{
 			$this->db->like('payment_type', $this->lang->line('sales_cash'));
+		}
+
+		if($filters['only_bs'] != FALSE)
+		{
+			$this->db->like('payment_type', $this->lang->line('sales_cash_bs'));
+		}
+
+		if($filters['only_zelle'] != FALSE)
+		{
+			$this->db->like('payment_type', $this->lang->line('sales_zelle'));
+		}
+
+		if($filters['only_movil'] != FALSE)
+		{
+			$this->db->like('payment_type', $this->lang->line('sales_pago_movil'));
 		}
 
 		if($filters['only_due'] != FALSE)

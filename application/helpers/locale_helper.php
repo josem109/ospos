@@ -257,30 +257,45 @@ function get_payment_options()
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
+		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
+		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
+		$payments[$lang->line('sales_pago_movil')] = $lang->line('sales_pago_movil');
 	}
 	elseif($config->item('payment_options_order') == 'debitcashcredit')
 	{
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
+		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
+		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
+		$payments[$lang->line('sales_pago_movil')] = $lang->line('sales_pago_movil');
 	}
 	elseif($config->item('payment_options_order') == 'creditdebitcash')
 	{
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
+		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
+		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
+		$payments[$lang->line('sales_pago_movil')] = $lang->line('sales_pago_movil');
 	}
 	elseif($config->item('payment_options_order') == 'creditcashdebit')
 	{
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
+		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
+		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
+		$payments[$lang->line('sales_pago_movil')] = $lang->line('sales_pago_movil');
 	}
 	else // default: if($config->item('payment_options_order') == 'cashdebitcredit')
 	{
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
+		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
+		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
+		$payments[$lang->line('sales_pago_movil')] = $lang->line('sales_pago_movil');
 	}
 
 	$payments[$lang->line('sales_due')] = $lang->line('sales_due');

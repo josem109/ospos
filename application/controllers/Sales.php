@@ -34,7 +34,10 @@ class Sales extends Secure_Controller
 			$data['table_headers'] = get_sales_manage_table_headers();
 
 			$data['filters'] = array('only_cash' => $this->lang->line('sales_cash_filter'),
-				'only_due' => $this->lang->line('sales_due_filter'),
+				'only_due' => $this->lang->line('sales_due_filter'),		
+				'only_bs' => $this->lang->line('sales_cash_bs_filter'),
+				'only_zelle' => $this->lang->line('sales_zelle_filter'),
+				'only_movil' => $this->lang->line('sales_pago_movil_filter'),
 				'only_check' => $this->lang->line('sales_check_filter'),
 				'only_creditcard' => $this->lang->line('sales_credit_filter'),
 				'only_invoices' => $this->lang->line('sales_invoice_filter'));
@@ -64,6 +67,9 @@ class Sales extends Secure_Controller
 						 'start_date' => $this->input->get('start_date'),
 						 'end_date' => $this->input->get('end_date'),
 						 'only_cash' => FALSE,
+						 'only_bs' => FALSE,
+						 'only_zelle' => FALSE,
+						 'only_movil' => FALSE,
 						 'only_due' => FALSE,
 						 'only_check' => FALSE,
 						 'only_creditcard' => FALSE,
