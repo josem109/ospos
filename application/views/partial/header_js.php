@@ -71,8 +71,8 @@ function actualizarPagina() {
   			let minuto = ahora.getMinutes();
   			let segundo = ahora.getSeconds();
 		
-  if (hora == 16 && minuto == 05 && segundo == 00) {
-	
+  if (hora == 16 && minuto == 15 && segundo == 00) {
+	$("#miAlerta").show();
 	//obtener_valor_dolar('https://www.bcv.org.ve/');
 	jQuery.ajax({
     type: "POST",
@@ -84,7 +84,9 @@ function actualizarPagina() {
 				  //alert('exito');
 		          if( !('error' in obj) ) {
                       yourVariable = obj.result;
-					  //alert(obj.result);
+					  $("#miAlerta").hide();
+					  location.reload();
+					  window.location.href = 'http://localhost/ospos/public/sales';
 					  
                   }
                   else {
@@ -99,7 +101,7 @@ function actualizarPagina() {
         //alert('Ha ocurrido un error al realizar la solicitud.');
     }
    });
-    alert('Se ha actualizado la tasa de cambio!');
+    //alert('Se ha actualizado la tasa de cambio!');
 
      location.reload();
   } else {
