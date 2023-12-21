@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $db = new PDO('mysql:host=localhost;dbname=ospos', 'root', '');
                 date_default_timezone_set('America/Caracas');
                 $fecha_hoy = date('Y-m-d'); // Obtiene la fecha actual
-                $query = $db->prepare("SELECT currency_rate FROM `currencytable` WHERE `currency_symbol` = :currency_symbol AND `currency_date` = :currency_date");
+                $query = $db->prepare("SELECT currency_rate FROM `ospos_currencytable` WHERE `currency_symbol` = :currency_symbol AND `currency_date` = :currency_date");
                 $query->bindParam(':currency_symbol', $currency_symbol);
                 $query->bindParam(':currency_date', $fecha_hoy);
                 $query->execute();
