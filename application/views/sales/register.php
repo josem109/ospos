@@ -115,8 +115,6 @@ if(isset($success))
 							title="<?php echo $this->lang->line($controller_name . '_new_item'); ?>">
 						<span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_new_item'); ?>
 					</button>
-				</li>
-				<li class="pull-right">
 					<button id="refresh_bcv_button" class='btn btn-info btn-sm pull-right'>
 						<span class="glyphicon glyphicon-usd">&nbsp</span><?php echo $this->lang->line('refresh_currency'); ?>
 					</button>
