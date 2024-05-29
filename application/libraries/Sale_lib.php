@@ -933,13 +933,14 @@ class Sale_lib
 			{
 				$item_quantity = $this->CI->Item_quantity->get_item_quantity($item_id, $item_location)->quantity;
 				$quantity_added = $this->get_quantity_already_added($item_id, $item_location);
-
-				if($item_quantity - $quantity_added < 0)
-				{
+				//Changed Jose Pinto 22/05/2024
+				if ($item_quantity == 0) {
+					return $this->CI->lang->line('sales_item_out_of_stock');
+				}
+				if ($item_quantity - $quantity_added < 0) {
 					return $this->CI->lang->line('sales_quantity_less_than_zero');
 				}
-				elseif($item_quantity - $quantity_added < $item_info->reorder_level)
-				{
+				elseif ($item_quantity - $quantity_added < $item_info->reorder_level) {
 					return $this->CI->lang->line('sales_quantity_less_than_reorder_level');
 				}
 			}

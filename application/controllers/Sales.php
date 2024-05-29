@@ -470,8 +470,16 @@ class Sales extends Secure_Controller
 			if(!$this->sale_lib->add_item($item_id_or_number_or_item_kit_or_receipt, $quantity, $item_location, $discount, $discount_type, PRICE_MODE_STANDARD, NULL, NULL, $price))*/
 		else {
 			$out_of_stock = $this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt, $item_location);
-			if ($out_of_stock == '')
+			if ($out_of_stock == 'Advertencia. La cantidad deseada no tiene stock suficiente. Puedes procesar la venta pero revisa tu inventario.')
 			{
+				$data['error'] = $this->lang->line('sales_item_out_of_stock');
+			}
+			if ($out_of_stock == '' || $out_of_stock == 'Advertencia. La cantidad disponible es menor al stock de seguridad.')
+			{
+				if ($out_of_stock == 'Advertencia. La cantidad disponible es menor al stock de seguridad.')
+				{
+					$data['warning'] = $this->lang->line('sales_quantity_less_than_reorder_level');
+				}
 				/*$data['error'] = $this->lang->line('sales_unable_to_add_item');*/
 				if (!$this->sale_lib->add_item($item_id_or_number_or_item_kit_or_receipt, $quantity, $item_location, $discount, $discount_type, PRICE_MODE_STANDARD, NULL, NULL, $price)) {
 					$data['error'] = $this->lang->line('sales_unable_to_add_item');
@@ -480,7 +488,7 @@ class Sales extends Secure_Controller
 			else
 			{
 				/*$data['warning'] = $this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt, $item_location);*/
-				$data['warning'] = $out_of_stock;
+				$data['error'] = $out_of_stock;
 			}
 		}
 
@@ -520,8 +528,18 @@ class Sales extends Secure_Controller
 			$data['error'] = $this->lang->line('sales_error_editing_item');
 		}
 
-		$data['warning'] = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
-
+		//$data['warning'] = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
+		$out_of_stock = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
+		if ($out_of_stock == "Advertencia. La cantidad deseada no tiene stock suficiente. Puedes procesar la venta pero revisa tu inventario.")
+		{
+			//$data['error'] = $out_of_stock;
+			$data['error'] = $this->lang->line('sales_item_out_of_stock');
+			//$this->delete_item(1);
+		}elseif($out_of_stock) {
+			$data['warning'] = $out_of_stock;
+		}
+			
+		
 		$this->_reload($data);
 	}
 
