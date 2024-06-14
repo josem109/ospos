@@ -1,14 +1,15 @@
 <?php
 $lang["customers_available_points"] = "Puntos Disponibles";
-$lang["price_ves"] = "Precio VES";
+$lang["price_ves"] = "Precio USD";
 $lang["refresh_currency"] = "Refrescar Tasa";
-$lang["sales_amount_due_ves"] = "Monto Adeudado VES";
+$lang["sales_amount_due_ves"] = "Monto Adeudado USD";
 $lang["rewards_package"] = "Premios";
 $lang["rewards_remaining_balance"] = "Puntos de recompensa sobrante son: ";
 $lang["sales_account_number"] = "Cuenta #";
 $lang["sales_add_payment"] = "Agregar Pago";
 $lang["sales_amount_due"] = "Monto de adeudo";
 $lang["sales_amount_tendered"] = "Cantidad Recibida";
+$lang["sales_amount_tendered_usd"] = "Cantidad Recibida USD";
 $lang["sales_authorized_signature"] = "Firma Autorizada";
 $lang["sales_cancel_sale"] = "Cancelar";
 $lang["sales_cash"] = "Efectivo";

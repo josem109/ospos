@@ -393,7 +393,8 @@ class Config extends Secure_Controller
 			'cash_decimals' => $this->input->post('cash_decimals'),
 			'cash_rounding_code' => $this->input->post('cash_rounding_code'),
 			'financial_year' => $this->input->post('financial_year'),
-			'currency_rate' => $this->input->post('currency_rate')
+			'currency_rate' => $this->input->post('currency_rate'),
+			'currency_rate_alternative' => $this->input->post('currency_rate_alternative')
 		);
 
 		$result = $this->Appconfig->batch_save($batch_save_data);
@@ -402,6 +403,7 @@ class Config extends Secure_Controller
 		// Obtiene los valores que necesitas para CurrencyTable
 		$currency_rate = $this->input->post('currency_rate');
 		$currency_symbol = $this->input->post('currency_symbol');
+		$currency_rate_alternative = $this->input->post('currency_rate_alternative');
 		
 		// Verifica si los valores necesarios están presentes
 		if (empty($currency_rate) || empty($currency_symbol)) {

@@ -351,12 +351,20 @@ class Sales extends Secure_Controller
 					}
 				}
 			}
-			elseif($payment_type === $this->lang->line('sales_cash'))
+			elseif($payment_type === $this->lang->line('sales_cash') || $payment_type === $this->lang->line('sales_zelle')
+			|| $payment_type === $this->lang->line('sales_debit') || $payment_type === $this->lang->line('sales_credit')
+			|| $payment_type === $this->lang->line('sales_cash_bs') || $payment_type === $this->lang->line('sales_pago_movil')
+			|| $payment_type === $this->lang->line('sales_check')) 
 			{
-				$amount_due = $this->sale_lib->get_total();
-				$sales_total = $this->sale_lib->get_total(FALSE);
-
+				$currency_rate = floatval($this->config->item('currency_rate'));
+				$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+				$amount_due = $this->sale_lib->get_total(TRUE, $currency_rate, $currency_rate_alternative);
+				$amount_due_ves = $amount_due * $currency_rate;
+				$sales_total = $this->sale_lib->get_total(FALSE, $currency_rate, $currency_rate_alternative);
 				$amount_tendered = $this->input->post('amount_tendered');
+				$amount_tendered_ves = $amount_tendered;
+				$amount_tendered = $amount_tendered  / $currency_rate;
+
 				$this->sale_lib->add_payment($payment_type, $amount_tendered);
 				$cash_adjustment_amount = $amount_due - $sales_total;
 				if($cash_adjustment_amount <> 0)
@@ -367,7 +375,9 @@ class Sales extends Secure_Controller
 			}
 			else
 			{
+				$currency_rate = $this->config->item('currency_rate');
 				$amount_tendered = $this->input->post('amount_tendered');
+				$amount_tendered = $amount_tendered / $currency_rate;
 				$this->sale_lib->add_payment($payment_type, $amount_tendered);
 			}
 		}
@@ -389,9 +399,7 @@ class Sales extends Secure_Controller
 
 		$discount = $this->config->item('default_sales_discount');
 		$discount_type = $this->config->item('default_sales_discount_type');
-		//Pinto 08/28/2023
-		$currency_rate = $this->config->item('currency_rate');
-		//End Pinto 08/28/2023
+		
 		// check if any discount is assigned to the selected customer
 		$customer_id = $this->sale_lib->get_customer();
 		if($customer_id != -1)
@@ -465,29 +473,20 @@ class Sales extends Secure_Controller
 				$data['warning'] = $stock_warning;
 			}
 		}
-		/*else
-		{
-			if(!$this->sale_lib->add_item($item_id_or_number_or_item_kit_or_receipt, $quantity, $item_location, $discount, $discount_type, PRICE_MODE_STANDARD, NULL, NULL, $price))*/
 		else {
-			$out_of_stock = $this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt, $item_location);
-			if ($out_of_stock == 'Advertencia. La cantidad deseada no tiene stock suficiente. Puedes procesar la venta pero revisa tu inventario.')
-			{
-				$data['error'] = $this->lang->line('sales_item_out_of_stock');
-			}
+			$out_of_stock = $this->sale_lib->out_of_stock_new($item_id_or_number_or_item_kit_or_receipt, $item_location);
 			if ($out_of_stock == '' || $out_of_stock == 'Advertencia. La cantidad disponible es menor al stock de seguridad.')
 			{
 				if ($out_of_stock == 'Advertencia. La cantidad disponible es menor al stock de seguridad.')
 				{
-					$data['warning'] = $this->lang->line('sales_quantity_less_than_reorder_level');
+					$data['warning'] = $out_of_stock;
 				}
-				/*$data['error'] = $this->lang->line('sales_unable_to_add_item');*/
 				if (!$this->sale_lib->add_item($item_id_or_number_or_item_kit_or_receipt, $quantity, $item_location, $discount, $discount_type, PRICE_MODE_STANDARD, NULL, NULL, $price)) {
 					$data['error'] = $this->lang->line('sales_unable_to_add_item');
 				}
 			}
 			else
 			{
-				/*$data['warning'] = $this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt, $item_location);*/
 				$data['error'] = $out_of_stock;
 			}
 		}
@@ -528,18 +527,8 @@ class Sales extends Secure_Controller
 			$data['error'] = $this->lang->line('sales_error_editing_item');
 		}
 
-		//$data['warning'] = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
-		$out_of_stock = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
-		if ($out_of_stock == "Advertencia. La cantidad deseada no tiene stock suficiente. Puedes procesar la venta pero revisa tu inventario.")
-		{
-			//$data['error'] = $out_of_stock;
-			$data['error'] = $this->lang->line('sales_item_out_of_stock');
-			//$this->delete_item(1);
-		}elseif($out_of_stock) {
-			$data['warning'] = $out_of_stock;
-		}
-			
-		
+		$data['warning'] = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
+	
 		$this->_reload($data);
 	}
 
@@ -552,6 +541,7 @@ class Sales extends Secure_Controller
 		$this->_reload();
 	}
 
+	
 	public function remove_customer()
 	{
 		$this->sale_lib->clear_giftcard_remainder();
@@ -621,9 +611,13 @@ class Sales extends Secure_Controller
 		$data['payments'] = $this->sale_lib->get_payments();
 
 		// Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
-		$totals = $this->sale_lib->get_totals($tax_details[0]);
-		$data['subtotal'] = $totals['subtotal'];
+		$currency_rate = floatval($this->config->item('currency_rate'));
+		$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+		$totals = $this->sale_lib->get_totals($tax_details[0], $currency_rate, $currency_rate_alternative);
+		//$data['subtotal'] = $totals['subtotal'];
+		$data['subtotal'] = $totals['subtotal'];//pinto subtotal
 		$data['total'] = $totals['total'];
+		$data['total2'] = $totals['total2'];
 		$data['payments_total'] = $totals['payment_total'];
 		$data['payments_cover_total'] = $totals['payments_cover_total'];
 		$data['cash_rounding'] = $this->session->userdata('cash_rounding');
@@ -632,19 +626,22 @@ class Sales extends Secure_Controller
 		$data['cash_total'] = $totals['cash_total'];
 		$data['non_cash_total'] = $totals['total'];
 		$data['cash_amount_due'] = $totals['cash_amount_due'];
+		$data['cash_amount_due_ves'] = $totals['cash_amount_due'];
 		$data['non_cash_amount_due'] = $totals['amount_due'];
 
 		if($data['cash_mode'])
 		{
 			$data['amount_due'] = $totals['cash_amount_due'];
+			$data['amount_due_ves'] = $totals['cash_amount_due_ves'];
 		}
 		else
 		{
 			$data['amount_due'] = $totals['amount_due'];
+			$data['amount_due_ves'] = $totals['amount_due_ves'];
 		}
 
 		$data['amount_change'] = $data['amount_due'] * -1;
-
+		$data['amount_change_ves'] = $data['amount_due_ves'] * -1;
 		if($data['amount_change'] > 0)
 		{
 			// Save cash refund to the cash payment transaction if found, if not then add as new Cash transaction
@@ -800,6 +797,13 @@ class Sales extends Secure_Controller
 			{
 				$sale_type = SALE_TYPE_POS;
 			}
+			
+			foreach ($data['cart'] as &$item) {
+				$item['price'] = ($item['price'] * $currency_rate_alternative) / $currency_rate;
+				$item['total'] = ($item['total'] * $currency_rate_alternative) / $currency_rate;
+				$item['discounted_total'] = ($item['discounted_total'] * $currency_rate_alternative) / $currency_rate;
+			}
+
 
 			$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details);
 
@@ -980,7 +984,9 @@ class Sales extends Secure_Controller
 		$data['include_hsn'] = ($this->config->item('include_hsn') == '1');
 
 		// Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
-		$totals = $this->sale_lib->get_totals($tax_details[0]);
+		$currency_rate = floatval($this->config->item('currency_rate'));
+		$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+		$totals = $this->sale_lib->get_totals($tax_details[0], $currency_rate, $currency_rate_alternative);
 		$this->session->set_userdata('cash_adjustment_amount', $totals['cash_adjustment_amount']);
 		$data['subtotal'] = $totals['subtotal'];
 		$data['payments_total'] = $totals['payment_total'];
@@ -990,21 +996,27 @@ class Sales extends Secure_Controller
 		$data['cash_total'] = $totals['cash_total'];
 		$data['non_cash_total'] = $totals['total'];
 		$data['cash_amount_due'] = $totals['cash_amount_due'];
+		$data['cash_amount_due_ves'] = $totals['cash_amount_due'];
 		$data['non_cash_amount_due'] = $totals['amount_due'];
 
 		if($data['cash_mode'] && ($data['selected_payment_type'] === $this->lang->line('sales_cash') || $data['payments_total'] > 0))
 		{
 			$data['total'] = $totals['cash_total'];
+			$data['total2'] = $totals['total2'];
 			$data['amount_due'] = $totals['cash_amount_due'];
+			$data['amount_due_ves'] = $totals['cash_amount_due_ves'];
 		}
 		else
 		{
 			$data['total'] = $totals['total'];
+			$data['total2'] = $totals['total2'];
 			$data['amount_due'] = $totals['amount_due'];
+			$data['amount_due_ves'] = $totals['cash_amount_due_ves'];
 		}
 
 		$data['amount_change'] = $data['amount_due'] * -1;
-
+		$data['amount_change_ves'] = $data['amount_due_ves'] * -1;
+		
 		$employee_info = $this->Employee->get_info($this->sale_lib->get_employee());
 		$data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
 		$this->_load_customer_data($this->sale_lib->get_customer(), $data);
@@ -1092,10 +1104,12 @@ class Sales extends Secure_Controller
 		$data['taxes'] = $tax_details[0];
 		$data['discount'] = $this->sale_lib->get_discount();
 		$data['payments'] = $this->sale_lib->get_payments();
-
+		
 		// Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
-		$totals = $this->sale_lib->get_totals($tax_details[0]);
-
+		$currency_rate = floatval($this->config->item('currency_rate'));
+		$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+		$totals = $this->sale_lib->get_totals($tax_details[0], $currency_rate, $currency_rate_alternative);
+		
 		$data['item_count'] = $totals['item_count'];
 		$data['total_units'] = $totals['total_units'];
 		$data['subtotal'] = $totals['subtotal'];
@@ -1110,6 +1124,7 @@ class Sales extends Secure_Controller
 		$data['cash_total'] = $totals['cash_total'];
 		$data['non_cash_total'] = $totals['total'];
 		$data['cash_amount_due'] = $totals['cash_amount_due'];
+		$data['cash_amount_due_ves'] = $totals['cash_amount_due_ves'];
 		$data['non_cash_amount_due'] = $totals['amount_due'];
 
 		$data['selected_payment_type'] = $this->sale_lib->get_payment_type();
@@ -1117,15 +1132,20 @@ class Sales extends Secure_Controller
 		if($data['cash_mode'] && ($data['selected_payment_type'] == $this->lang->line('sales_cash') || $data['payments_total'] > 0))
 		{
 			$data['total'] = $totals['cash_total'];
+			$data['total2'] = $totals['total2'];
 			$data['amount_due'] = $totals['cash_amount_due'];
+			$data['amount_due_ves'] = $totals['cash_amount_due_ves'];
 		}
 		else
 		{
 			$data['total'] = $totals['total'];
+			$data['total2'] = $totals['total2'];
 			$data['amount_due'] = $totals['amount_due'];
+			$data['amount_due_ves'] = $totals['amount_due_ves'];
 		}
 
 		$data['amount_change'] = $data['amount_due'] * -1;
+		$data['amount_change_ves'] = $data['amount_due_ves'] * -1;
 
 		$data['comment'] = $this->sale_lib->get_comment();
 		$data['email_receipt'] = $this->sale_lib->is_email_receipt();

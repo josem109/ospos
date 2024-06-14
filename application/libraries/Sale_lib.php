@@ -482,17 +482,16 @@ class Sale_lib
 	 * Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'paid_in_full'
 	 * 'subtotal', 'discounted_subtotal', 'tax_exclusive_subtotal', 'item_count', 'total_units', 'cash_adjustment_amount'
 	 */
-	public function get_totals($taxes)
+	public function get_totals($taxes, $currency_rate = 1.0, $currency_rate_alternative = 1.0)
 	{
 		$totals = array();
-
 		$prediscount_subtotal = 0.0;
 		$subtotal = 0.0;
 		$total = 0.0;
+		$total2 = 0.0;
 		$total_discount = 0.0;
 		$item_count = 0;
 		$total_units = 0.0;
-
 		foreach($this->get_cart() as $item)
 		{
 			if($item['stock_type'] == HAS_STOCK)
@@ -501,14 +500,18 @@ class Sale_lib
 				$total_units += $item['quantity'];
 			}
 			$discount_amount = $this->get_item_discount($item['quantity'], $item['price'], $item['discount'], $item['discount_type']);
+			$discount_amount = ($discount_amount * $currency_rate_alternative) / $currency_rate;
 			$total_discount = bcadd($total_discount, $discount_amount);
 
 			$extended_amount = $this->get_extended_amount($item['quantity'], $item['price']);
+			$extended_amount = ($extended_amount * $currency_rate_alternative) / $currency_rate;
 			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], $item['price'], $discount_amount);
+			$extended_discounted_amount = ($extended_discounted_amount * $currency_rate_alternative) / $currency_rate;
 			$prediscount_subtotal= bcadd($prediscount_subtotal, $extended_amount);
 			$total = bcadd($total, $extended_discounted_amount);
 
 			$subtotal = bcadd($subtotal, $extended_discounted_amount);
+			$subtotal = $subtotal * $currency_rate;
 		}
 
 		$totals['prediscount_subtotal'] = $prediscount_subtotal;
@@ -530,6 +533,7 @@ class Sale_lib
 
 		$totals['subtotal'] = $subtotal;
 		$totals['total'] = $total;
+		$totals['total2'] = $total * $currency_rate;
 		$totals['tax_total'] = $sales_tax;
 
 		$payment_total = $this->get_payments_total();
@@ -550,9 +554,10 @@ class Sale_lib
 
 		$amount_due = bcsub($total, $payment_total);
 		$totals['amount_due'] = $amount_due;
-
+		$totals['amount_due_ves'] = $amount_due * $currency_rate;
 		$cash_amount_due = bcsub($cash_total, $payment_total);
 		$totals['cash_amount_due'] = $cash_amount_due;
+		$totals['cash_amount_due_ves'] = $cash_amount_due * $currency_rate;
 
 		if($cash_mode)
 		{
@@ -585,7 +590,8 @@ class Sale_lib
 		}
 
 		$cash_mode = $this->CI->session->userdata('cash_mode');
-
+		
+		
 		return $totals;
 	}
 
@@ -933,14 +939,42 @@ class Sale_lib
 			{
 				$item_quantity = $this->CI->Item_quantity->get_item_quantity($item_id, $item_location)->quantity;
 				$quantity_added = $this->get_quantity_already_added($item_id, $item_location);
-				//Changed Jose Pinto 22/05/2024
-				if ($item_quantity == 0) {
-					return $this->CI->lang->line('sales_item_out_of_stock');
-				}
-				if ($item_quantity - $quantity_added < 0) {
+				if ($item_quantity - $quantity_added < 0) 
+				{
 					return $this->CI->lang->line('sales_quantity_less_than_zero');
 				}
-				elseif ($item_quantity - $quantity_added < $item_info->reorder_level) {
+				elseif ($item_quantity - $quantity_added < $item_info->reorder_level) 
+				{
+					return $this->CI->lang->line('sales_quantity_less_than_reorder_level');
+				}
+			}
+		}
+
+		return '';
+	}
+
+	public function out_of_stock_new($item_id, $item_location)
+	{
+		//make sure item exists
+		if($item_id != -1)
+
+		{
+			$item_info = $this->CI->Item->get_info_by_id_or_number($item_id);
+			$item_id_low = $item_info->item_id;
+			if($item_info->stock_type == HAS_STOCK)
+			{
+				$item_quantity = $this->CI->Item_quantity->get_item_quantity($item_id_low, $item_location)->quantity;
+				$quantity_added = $this->get_quantity_already_added($item_id, $item_location);
+				if ($item_quantity - $quantity_added == 0) 
+				{
+					return $this->CI->lang->line('sales_quantity_less_than_zero');
+				}
+				if ($item_quantity - $quantity_added < 0) 
+				{
+					return $this->CI->lang->line('sales_quantity_less_than_zero');
+				}
+				elseif ($item_quantity - $quantity_added < $item_info->reorder_level) 
+				{
 					return $this->CI->lang->line('sales_quantity_less_than_reorder_level');
 				}
 			}
@@ -1328,10 +1362,10 @@ class Sale_lib
 	 * @param bool $include_cash_rounding
 	 * @return float|int|string
 	 */
-	public function get_total($include_cash_rounding = TRUE)
+	public function get_total($include_cash_rounding = TRUE, $currency_rate = 1, $currency_rate_alternative = 1)
 	{
 		$total = $this->calculate_subtotal(TRUE);
-
+		$total = ($total * $currency_rate_alternative) / $currency_rate;
 		$cash_mode = $this->CI->session->userdata('cash_mode');
 
 		if(!$this->CI->config->item('tax_included'))

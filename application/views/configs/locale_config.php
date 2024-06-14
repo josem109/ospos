@@ -231,7 +231,12 @@
 					<?php echo form_input('currency_rate', $this->config->item('currency_rate'), array('class' => 'form-control input-sm')); ?>
 				</div>
 			</div>
-			
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('Tasa de Cambio Paralelo'), 'currency_rate_alternative', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-1'>
+					<?php echo form_input('currency_rate_alternative', $this->config->item('currency_rate_alternative'), array('class' => 'form-control input-sm')); ?>
+				</div>
+			</div>
 
 			<?php echo form_submit(array(
 				'name' => 'submit_locale',
