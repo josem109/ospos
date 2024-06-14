@@ -15,6 +15,8 @@
 				//location.reload();
             });
         });
+		//Pinto 06/06/2024
+		//Pinto 06/06/2024
     </script>
 <?php
 echo '
@@ -35,6 +37,7 @@ if(isset($success))
 {
 	echo "<div class='alert alert-dismissible alert-success'>".$success."</div>";
 }
+
 ?>
 
 <div id="register_wrapper">
@@ -129,6 +132,12 @@ if(isset($success))
 				?>
 				</span>
 		</p>
+		<p>Tasa de cambio Paralela: <span id="tasa_cambio">-->
+				<?php echo($this->config->item('currency_rate_alternative')); 
+					$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+				?>
+				</span>
+		</p>
 		<!-- End Pinto 08/28/2023 -->		
 	<?php echo form_close(); ?>
 
@@ -143,7 +152,8 @@ if(isset($success))
 				<th style="width: 5%; "><?php echo $this->lang->line('common_delete'); ?></th>
 				<th style="width: 15%;"><?php echo $this->lang->line('sales_item_number'); ?></th>
 				<th style="width: 30%;"><?php echo $this->lang->line('sales_item_name'); ?></th>
-				<th style="width: 10%;"><?php echo $this->lang->line('sales_price'); ?></th>
+				<!--<th style="width: 10%;"><?php echo $this->lang->line('sales_price'); ?></th> -->
+				<th style="width: 10%;"><?php echo $this->lang->line('sales_price_parallel'); ?></th>
 				<th style="width: 10%;"><?php echo $this->lang->line('price_ves'); ?></th>
 				<th style="width: 10%;"><?php echo $this->lang->line('sales_quantity'); ?></th>
 				<th style="width: 15%;"><?php echo $this->lang->line('sales_discount'); ?></th>
@@ -201,26 +211,49 @@ if(isset($success))
 							}
 							?>
 
-							<td>
+							<td id="price_section" style="display: none">
 								<?php
 								if($items_module_allowed && $change_price)
 								{
+									
 									echo form_input(array('name'=>'price', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($item['price']), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));	
+									
 								}
 								else
 								{
+									
 									echo to_currency($item['price']);
 									echo form_hidden('price', to_currency_no_money($item['price']));
 								}
 								?>
 							</td>
+							<!-- Pinto 02/06/2024 Precio en Bolivares-->
+
+							<td>	
+								<?php
+								if($items_module_allowed && $change_price)
+								{
+									$precio_multiplicado = ($item['price'] * $currency_rate_alternative);
+									
+									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'style'=>'font-size: 10px', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
+
+								}
+								else
+								{
+									/*echo to_currency($item['price']);
+									echo form_hidden('price_converted', to_currency_no_money($item['price']));*/
+								}
+								?>
+							</td>
+							<!-- Fin Pinto 02/06/2024 -->
+
 							<!-- Pinto 22/08/2023 -->
 
 							<td>
 								<?php
 								if($items_module_allowed && $change_price)
 								{
-									$precio_multiplicado = $item['price'] * $currency_rate;
+									$precio_multiplicado = ($item['price'] * $currency_rate_alternative) / $currency_rate;
 									
 									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'style'=>'font-size: 10px', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
 
@@ -260,11 +293,15 @@ if(isset($success))
 								<?php
 								if($item['item_type'] == ITEM_AMOUNT_ENTRY)
 								{
-									echo form_input(array('name'=>'discounted_total', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($item['discounted_total']), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));
+									$total_line_bs = ($item['discounted_total'] * $currency_rate_alternative);
+									/*echo form_input(array('name'=>'discounted_total', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($item['discounted_total']), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));*/
+									echo form_input(array('name'=>'discounted_total', 'class'=>'form-control input-sm', 'value'=>to_currency_no_money($total_line_bs), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));
 								}
 								else
 								{
-									echo to_currency($item['discounted_total']);
+									$total_line_bs = ($item['discounted_total'] * $currency_rate_alternative);
+									/*echo to_currency($item['discounted_total']);*/
+									echo to_currency($total_line_bs);
 								}
 								?>
 							</td>
@@ -343,6 +380,7 @@ if(isset($success))
 							?>
 						</tr>
 					<?php echo form_close(); ?>
+					
 			<?php
 				}
 			}
@@ -470,7 +508,7 @@ if(isset($success))
 			</tr>
 			<tr>
 				<th style="width: 55%;"><?php echo $this->lang->line('sales_sub_total'); ?></th>
-				<th style="width: 45%; text-align: right;"><?php echo to_currency($subtotal); ?></th>
+				<th style="width: 45%; text-align: right;"><?php echo to_currency_bcv($subtotal); ?></th>
 			</tr>
 
 			<?php
@@ -487,12 +525,12 @@ if(isset($success))
 
 			<tr>
 				<th style="width: 55%; font-size: 150%"><?php echo $this->lang->line('sales_total'); ?></th>
-				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency($total); ?></span></th>
+				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total2"><?php echo to_currency_bcv($total2); ?></span></th>
 			</tr>
 			<!-- Pinto 22/08/2023 -->
 			<tr>
 				<th style="width: 55%; font-size: 150%"><?php echo $this->lang->line('total_ves'); ?></th>
-				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency_bcv($currency_rate*$total); ?></span></th>
+				<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_total"><?php echo to_currency($total); ?></span></th>
 			</tr>
 			<!-- Fin Pinto 22/08/2023 -->
 		</table>
@@ -509,12 +547,12 @@ if(isset($success))
 				</tr>
 				<tr>
 					<th style="width: 55%; font-size: 120%"><?php echo $this->lang->line('sales_amount_due'); ?></th>
-					<th style="width: 45%; font-size: 120%; text-align: right;"><span id="sale_amount_due"><?php echo to_currency($amount_due); ?></span></th>
+					<th style="width: 45%; font-size: 120%; text-align: right;"><span id="sale_amount_due_ves"><?php echo to_currency_bcv($amount_due_ves); ?></span></th>
 				</tr>
 				 <!-- Pinto 11/09/2023-->
 				 <tr>
 					<th style="width: 55%; font-size: 120%"><?php echo $this->lang->line('sales_amount_due_ves'); ?></th>
-					<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_amount_due"><?php echo to_currency_bcv($currency_rate*$amount_due); ?></span></th>
+					<th style="width: 45%; font-size: 150%; text-align: right;"><span id="sale_amount_due"><?php echo to_currency($amount_due); ?></span></th>
 				</tr>
 				<!-- Pinto 11/09/2023-->
 			</table>
@@ -539,6 +577,14 @@ if(isset($success))
 									<?php echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered', 'class'=>'form-control input-sm disabled', 'disabled'=>'disabled', 'value'=>'0', 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
 								</td>
 							</tr>
+				<!-- Pinto 06/06/2024-->
+							<tr>
+								<td><span id="amount_tendered_label_ves"><?php echo $this->lang->line('sales_amount_tendered_ves'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered_ves', 'class'=>'form-control input-sm disabled', 'disabled'=>'disabled', 'value'=>'0', 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
+								</td>
+							</tr>
+				 <!-- Pinto 06/06/2024-->
 						</table>
 					<?php echo form_close(); ?>
 
@@ -587,6 +633,15 @@ if(isset($success))
 									<?php echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered', 'class'=>'form-control input-sm giftcard-input', 'disabled' => true, 'value'=>to_currency_no_money($amount_due), 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
 								</td>
 							</tr>
+							<!--Pinto 06/06/2024-->
+							<tr>
+								<td><span id="amount_tendered_label_ves"><?php echo $this->lang->line('sales_amount_tendered_ves'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered_ves', 'class'=>'form-control input-sm non-giftcard-input', 'value'=>to_currency_no_money($amount_due_ves), 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
+									<?php //echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered', 'class'=>'form-control input-sm giftcard-input', 'disabled' => true, 'value'=>to_currency_no_money($amount_due), 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
+							<!--Pinto 06/06/2024-->
 						</table>
 					<?php echo form_close(); ?>
 
@@ -733,6 +788,10 @@ if(isset($success))
 <script type="text/javascript">
 $(document).ready(function()
 {
+	var currencyRate = <?php echo floatval($currency_rate); ?>;
+	
+	//alert(currencyRate);
+	//alert(currencyRateAlternative);
 	const redirect = function() {
 		window.location.href = "<?php echo site_url('sales'); ?>";
 	};
@@ -880,6 +939,36 @@ $(document).ready(function()
 	}
 	?>
 
+	$('#amount_tendered').change(function() {
+		var value = $('#amount_tendered').val();
+        
+    	var currencyRate = <?php echo floatval($this->config->item('currency_rate')); ?>;
+    
+    	// Convierte el valor a un número y realiza la operación en JavaScript
+    	var usdValue = parseFloat(value) * currencyRate;
+    
+    	// Formatea el valor con coma como separador decimal
+    	var formattedValue = usdValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    	// Actualiza el campo amount_tendered_ves
+    	$("#amount_tendered_ves").val(formattedValue);
+	});
+
+	$('#amount_tendered_ves').change(function() {
+		var value = $('#amount_tendered_ves').val();
+        
+    	var currencyRate = <?php echo floatval($this->config->item('currency_rate')); ?>;
+    
+    	// Convierte el valor a un número y realiza la operación en JavaScript
+    	var usdValue = parseFloat(value) / currencyRate;
+    
+    	// Formatea el valor con coma como separador decimal
+    	var formattedValue = usdValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    	// Actualiza el campo amount_tendered_ves
+    	$("#amount_tendered").val(formattedValue);
+	});
+
 	$('#sales_print_after_sale').change(function() {
 		$.post("<?php echo site_url($controller_name.'/set_print_after_sale'); ?>", {sales_print_after_sale: $(this).is(':checked')});
 	});
@@ -985,9 +1074,11 @@ $(document).ready(function()
 function check_payment_type()
 {
 	var cash_mode = <?php echo json_encode($cash_mode); ?>;
-
+	var paymentType = $('#payment_types').val();
+    //alert("El tipo de pago seleccionado es: " + paymentType);
 	if($("#payment_types").val() == "<?php echo $this->lang->line('sales_giftcard'); ?>")
 	{
+		$("#sale_total2").html("<?php echo to_currency_bcv($total2); ?>");
 		$("#sale_total").html("<?php echo to_currency($total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($amount_due); ?>");
 		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_giftcard_number'); ?>");
@@ -995,24 +1086,54 @@ function check_payment_type()
 		$(".giftcard-input").attr('disabled', false);
 		$(".non-giftcard-input").attr('disabled', true);
 		$(".giftcard-input:enabled").val('').focus();
+		$("#amount_tendered_ves").hide();
 	}
 	else if(($("#payment_types").val() == "<?php echo $this->lang->line('sales_cash'); ?>" && cash_mode == '1'))
 	{
+		$("#amount_tendered_ves").show();
+		$test = $("#payment_types").val();
+		$("#sale_total2").html("<?php echo to_currency_bcv($total2); ?>");
 		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($cash_amount_due); ?>");
 		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
 		$("#amount_tendered:enabled").val("<?php echo to_currency_no_money($cash_amount_due); ?>");
+		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
+		$("#amount_tendered_ves:enabled").val("<?php echo to_currency_no_money($cash_amount_due_ves); ?>");
 		$(".giftcard-input").attr('disabled', true);
 		$(".non-giftcard-input").attr('disabled', false);
+		
 	}
 	else
 	{
+		$("#amount_tendered_ves").show();
+		$("#sale_total2").html("<?php echo to_currency_bcv($total2); ?>");
 		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($amount_due); ?>");
 		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
 		$("#amount_tendered:enabled").val("<?php echo to_currency_no_money($amount_due); ?>");
+		$("#amount_tendered_ves:enabled").val("<?php echo to_currency_no_money($amount_due_ves); ?>");
 		$(".giftcard-input").attr('disabled', true);
 		$(".non-giftcard-input").attr('disabled', false);
+	}
+	if (paymentType == "<?php echo $this->lang->line('sales_cash'); ?>" || 
+        paymentType == "<?php echo $this->lang->line('sales_zelle'); ?>") 
+	{
+		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
+		$("#amount_tendered:enabled").val("<?php echo to_currency_no_money($cash_amount_due); ?>");
+		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
+		$("#amount_tendered_ves:enabled").val("<?php echo to_currency_no_money($cash_amount_due_ves); ?>");
+		$("#amount_tendered_label").show();
+		$("#amount_tendered").show();
+		$("#amount_tendered_label_ves").hide();
+		$("#amount_tendered_ves").hide();
+		//alert($("#amount_tendered"));
+	}else
+	{
+		$("#amount_tendered_label").hide();
+		$("#amount_tendered").hide();
+		$("#amount_tendered_label_ves").show();
+		$("#amount_tendered_ves").show();
+		//alert($("#amount_tendered_ves"));
 	}
 }
 
@@ -1061,6 +1182,8 @@ document.body.onkeyup = function(e)
 			break;		  
     }
 }
+
+
 
 </script>
 

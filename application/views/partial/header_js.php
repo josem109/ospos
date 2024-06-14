@@ -1,3 +1,4 @@
+
 <script type="text/javascript">
 	function obtener_valor_dolar(url) {
     // Obtener el contenido de la página web
@@ -172,4 +173,6 @@ function actualizarPagina() {
 		setup_csrf_token();
 		submit.apply(this, arguments);
 	};
+
+	
 </script>

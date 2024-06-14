@@ -1,5 +1,6 @@
 <?php
 $lang["customers_available_points"] = "Puntos Disponibles";
+$lang["sales_price_parallel"] = "Precio Bs.";
 $lang["refresh_currency"] = "Refrescar Tasa";
 $lang["sales_pago_movil"] = "Pago Móvil";
 $lang["sales_cash_bs"] = "Bolívares Efectivo";
@@ -12,8 +13,9 @@ $lang["rewards_remaining_balance"] = "El remanente de puntos es ";
 $lang["sales_account_number"] = "Cuenta #";
 $lang["sales_add_payment"] = "Agregar Pago";
 $lang["sales_amount_due"] = "Monto Adeudado";
-$lang["sales_amount_due_ves"] = "Monto Adeudado VES";
-$lang["sales_amount_tendered"] = "Cantidad Recibida";
+$lang["sales_amount_due_ves"] = "Monto Adeudado USD";
+$lang["sales_amount_tendered"] = "Cantidad Recibida USD.";
+$lang["sales_amount_tendered_ves"] = "Cant. Recibida Bs.";
 $lang["sales_authorized_signature"] = "Firma Autorizada";
 $lang["sales_cancel_sale"] = "Cancelar Venta";
 $lang["sales_cash"] = "Divisas Efectivo";

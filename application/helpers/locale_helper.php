@@ -369,8 +369,9 @@ function to_currency($number)
 
 function to_currency_bcv($number)
 {
-	$fmt = new NumberFormatter( 'es_VE', NumberFormatter::CURRENCY );
-	return $fmt->formatCurrency($number, 'VES')."\n";
+	$fmt = new NumberFormatter( 'es-VE', NumberFormatter::CURRENCY );
+	//return $fmt->formatCurrency($number, 'Bs.')."\n";
+	return $fmt->formatCurrency($number, 'Bs.');
 }
 
 function to_currency_no_money($number)

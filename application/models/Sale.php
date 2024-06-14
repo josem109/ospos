@@ -620,7 +620,7 @@ class Sale extends CI_Model
 	public function save($sale_id, &$sale_status, &$items, $customer_id, $employee_id, $comment, $invoice_number,
 							$work_order_number, $quote_number, $sale_type, $payments, $dinner_table, &$sales_taxes)
 	{
-		if($sale_id != -1)
+ 		if($sale_id != -1)
 		{
 			$this->clear_suspended_sale_detail($sale_id);
 		}
@@ -631,6 +631,8 @@ class Sale extends CI_Model
 		{
 			return -1;
 		}
+
+
 
 		$sales_data = array(
 			'sale_time'			=> date('Y-m-d H:i:s'),

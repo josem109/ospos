@@ -37,6 +37,7 @@ class Item extends CI_Model
 		}
 
 		$this->db->where('item_number', (string) $item_number);
+		$this->db->where('deleted', 0);  // Agregar esta línea para excluir artículos borrados
 		// check if $item_id is a number and not a string starting with 0
 		// because cases like 00012345 will be seen as a number where it is a barcode
 		if(ctype_digit($item_id) && substr($item_id, 0, 1) != '0')

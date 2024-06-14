@@ -31,7 +31,7 @@ $config['commit_sha1'] = 'ffe492';
 | however intranet only installations may not need this so they can set FALSE to improve performance 
 | 
 */ 
-$config['ospos_xss_clean'] = TRUE;
+$config['ospos_xss_clean'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
