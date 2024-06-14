@@ -474,6 +474,7 @@ class Sales extends Secure_Controller
 			}
 		}
 		else {
+
 			$out_of_stock = $this->sale_lib->out_of_stock_new($item_id_or_number_or_item_kit_or_receipt, $item_location);
 			if ($out_of_stock == '' || $out_of_stock == 'Advertencia. La cantidad disponible es menor al stock de seguridad.')
 			{
@@ -481,13 +482,24 @@ class Sales extends Secure_Controller
 				{
 					$data['warning'] = $out_of_stock;
 				}
+
+			$out_of_stock = $this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt, $item_location);
+			if ($out_of_stock == '')
+			{
+				/*$data['error'] = $this->lang->line('sales_unable_to_add_item');*/
+
 				if (!$this->sale_lib->add_item($item_id_or_number_or_item_kit_or_receipt, $quantity, $item_location, $discount, $discount_type, PRICE_MODE_STANDARD, NULL, NULL, $price)) {
 					$data['error'] = $this->lang->line('sales_unable_to_add_item');
 				}
 			}
 			else
 			{
+
 				$data['error'] = $out_of_stock;
+
+				/*$data['warning'] = $this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt, $item_location);*/
+				$data['warning'] = $out_of_stock;
+
 			}
 		}
 
@@ -528,7 +540,7 @@ class Sales extends Secure_Controller
 		}
 
 		$data['warning'] = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
-	
+
 		$this->_reload($data);
 	}
 

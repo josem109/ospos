@@ -974,6 +974,12 @@ class Sale_lib
 					return $this->CI->lang->line('sales_quantity_less_than_zero');
 				}
 				elseif ($item_quantity - $quantity_added < $item_info->reorder_level) 
+
+				if($item_quantity - $quantity_added < 0)
+				{
+					return $this->CI->lang->line('sales_quantity_less_than_zero');
+				}
+				elseif($item_quantity - $quantity_added < $item_info->reorder_level)
 				{
 					return $this->CI->lang->line('sales_quantity_less_than_reorder_level');
 				}
