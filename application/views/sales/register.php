@@ -302,7 +302,7 @@ if(isset($success))
 								{
 									$total_line_bs = ($item['discounted_total'] * $currency_rate_alternative);
 									/*echo to_currency($item['discounted_total']);*/
-									echo to_currency($total_line_bs);
+									echo to_currency_bcv($total_line_bs);
 								}
 								?>
 							</td>

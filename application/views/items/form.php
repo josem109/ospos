@@ -456,6 +456,8 @@
 //validation and submit handling
 $(document).ready(function()
 {
+	// Deshabilitar el botón #new
+	$('#new').prop('disabled', true);
 	$('#new').click(function() {
 		stay_open = true;
 		$('#item_form').submit();
@@ -465,6 +467,7 @@ $(document).ready(function()
 		stay_open = false;
 	});
 
+	
 	$("input[name='tax_category']").change(function() {
 		!$(this).val() && $(this).val('');
 	});

@@ -17,11 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (preg_match($pattern, $html, $matches)) {
             $valor = trim($matches[1]);
             $valor = str_replace(',', '.', $valor); // Cambia la coma por un punto
+            $valor = round($valor, 2); // Redondea a dos decimales
             $valor2 = trim($matches2[1]);
             $fecha = date('Y-m-d', strtotime($valor2)); 
             $currency_symbol = 'USD';
             try {
-                $db = new PDO('mysql:host=localhost;dbname=ospos', 'root', '');
+                $db = new PDO('mysql:host=localhost;dbname=osposam', 'root', '');
                 date_default_timezone_set('America/Caracas');
                 $fecha_hoy = date('Y-m-d'); // Obtiene la fecha actual
                 $query = $db->prepare("SELECT currency_rate FROM `ospos_currencytable` WHERE `currency_symbol` = :currency_symbol AND `currency_date` = :currency_date");

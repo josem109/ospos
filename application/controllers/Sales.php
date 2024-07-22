@@ -498,7 +498,8 @@ class Sales extends Secure_Controller
 	{
 		$data = array();
 		//Pinto 08/28/2023
-		//$currency_rate = $this->config->item('currency_rate');
+		$currency_rate = $this->config->item('currency_rate');
+		$currency_rate_alternative = $this->config->item('currency_rate_alternative');
 		//End Pinto 08/28/2023
 		$this->form_validation->set_rules('price', 'lang:sales_price', 'required|callback_numeric');
 		$this->form_validation->set_rules('quantity', 'lang:sales_quantity', 'required|callback_numeric');
@@ -507,7 +508,6 @@ class Sales extends Secure_Controller
 		$description = $this->input->post('description');
 		$serialnumber = $this->input->post('serialnumber');
 		$price = parse_decimals($this->input->post('price'));
-		//$price = 42;
 		$quantity = parse_quantity($this->input->post('quantity'));
 		$discount_type = $this->input->post('discount_type');
 		$discount = $discount_type ? parse_quantity($this->input->post('discount')) : parse_decimals($this->input->post('discount'));
@@ -646,9 +646,26 @@ class Sales extends Secure_Controller
 		{
 			// Save cash refund to the cash payment transaction if found, if not then add as new Cash transaction
 
-			if(array_key_exists($this->lang->line('sales_cash'), $data['payments']))
+			if (array_key_exists($this->lang->line('sales_cash'), $data['payments']) || array_key_exists($this->lang->line('sales_zelle'), $data['payments'])
+			|| array_key_exists($this->lang->line('sales_credit'), $data['payments']) || array_key_exists($this->lang->line('sales_debit'), $data['payments'])
+			|| array_key_exists($this->lang->line('sales_pago_movil'), $data['payments']))
+
 			{
-				$data['payments'][$this->lang->line('sales_cash')]['cash_refund'] = $data['amount_change'];
+    			if (array_key_exists($this->lang->line('sales_cash'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_cash')]['cash_refund'] = $data['amount_change'];
+				} elseif (array_key_exists($this->lang->line('sales_zelle'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_zelle')]['cash_refund'] = $data['amount_change'];
+				} elseif (array_key_exists($this->lang->line('sales_credit'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_credit')]['cash_refund'] = $data['amount_change'];
+				} elseif (array_key_exists($this->lang->line('sales_debit'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_debit')]['cash_refund'] = $data['amount_change'];
+				} elseif (array_key_exists($this->lang->line('sales_pago_movil'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_pago_movil')]['cash_refund'] = $data['amount_change'];
+				} else {
+					$payment = array($this->lang->line('sales_cash') => array('payment_type' => $this->lang->line('sales_cash'), 'payment_amount' => 0, 'cash_refund' => $data['amount_change']));
+					$data['payments'] += $payment;
+				}
+				
 			}
 			else
 			{

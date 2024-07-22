@@ -294,7 +294,7 @@ class Item extends CI_Model
 	{
 		$this->db->group_start();
 		$this->db->where('items.item_number', $item_id);
-
+		$this->db->where('items.deleted', 0);
 		// check if $item_id is a number and not a string starting with 0
 		// because cases like 00012345 will be seen as a number where it is a barcode
 		if(ctype_digit($item_id) && substr($item_id, 0, 1) != '0')
