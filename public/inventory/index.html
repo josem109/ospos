@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory and Price Lookup</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .product-table {
+            margin-top: 2rem;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .page-link {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Inventory and Price Lookup</h1>
+        <div class="input-group mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Enter Codebar or Product Name">
+            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="dolarParalelo" class="form-label">Dolar Paralelo</label>
+                <input type="number" id="dolarParalelo" class="form-control" step="0.01">
+            </div>
+            <div class="col-md-6">
+                <label for="dolarBCV" class="form-label">Dolar BCV</label>
+                <input type="number" id="dolarBCV" class="form-control" step="0.01">
+            </div>
+        </div>
+        
+        <h2 class="mb-3">Products</h2>
+        <div class="table-responsive product-table">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Codebar</th>
+                        <th>Name</th>
+                        <th>Stock</th>
+                        <th>Price ($)</th>
+                        <th>Bs.</th>
+                        <th>Precio Final ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <!-- Product rows will be dynamically inserted here -->
+                </table>
+              </table>
+            </div>
+            <nav aria-label="Product navigation">
+                <ul class="pagination justify-content-center" id="paginationContainer">
+                    <!-- Pagination buttons will be dynamically inserted here -->
+                </ul>
+            </nav>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -35,7 +35,7 @@ IndexIgnore *
   </Files>
 
   # prevent access to csv, txt and md files
-  <FilesMatch "\.(csv|txt|md|yml|json|lock)$">
+  <FilesMatch "\.(csv|txt|md|yml|lock)$">
     Require all denied
   </FilesMatch>
 </IfModule>
@@ -64,9 +64,11 @@ IndexIgnore *
   </Files>
 
   # prevent access to csv, txt and md files
-  <FilesMatch "\.(csv|txt|md|yml|json|lock)$">
+  <FilesMatch "\.(csv|txt|md|yml|lock)$">
     Order allow,deny
     Deny from all
     Satisfy all
   </FilesMatch>
 </IfModule>
+
+

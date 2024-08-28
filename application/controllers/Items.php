@@ -66,10 +66,13 @@ class Items extends Secure_Controller
 		$items = $this->Item->search($search, $filters, $limit, $offset, $sort, $order);
 		$total_rows = $this->Item->get_found_rows($search, $filters);
 		$data_rows = [];
-
+		//Jose Pinto 08/04/2024
+		$currency_rate = floatval($this->config->item('currency_rate'));
+		$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+		//Jose Pinto 08/04/2024
 		foreach($items->result() as $item)
 		{
-			$data_rows[] = $this->xss_clean(get_item_data_row($item));
+			$data_rows[] = $this->xss_clean(get_item_data_row($item, $currency_rate, $currency_rate_alternative));
 
 			if($item->pic_filename !== NULL)
 			{

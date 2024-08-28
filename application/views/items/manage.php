@@ -56,7 +56,20 @@ $(document).ready(function()
     });
 });
 </script>
-
+<!-- Pinto 08/04/2024 -->		
+<p>Tasa de cambio BCV: <span id="tasa_cambio">-->
+				<?php echo($this->config->item('currency_rate')); 
+					$currency_rate = floatval($this->config->item('currency_rate'));
+				?>
+				</span>
+		</p>
+		<p>Tasa de cambio Paralela: <span id="tasa_cambio">-->
+				<?php echo($this->config->item('currency_rate_alternative')); 
+					$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+				?>
+				</span>
+		</p>
+		<!-- End Pinto 08/04/2024 -->	
 <div id="title_bar" class="btn-toolbar print_hide">
     <button class='btn btn-info btn-sm pull-right modal-dlg' data-btn-submit='<?php echo $this->lang->line('common_submit') ?>' data-href='<?php echo site_url("$controller_name/csv_import"); ?>'
             title='<?php echo $this->lang->line('items_import_items_csv'); ?>'>

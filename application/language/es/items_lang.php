@@ -111,6 +111,7 @@ $lang["items_tax_percents"] = "Porcentaje de Impuesto(s)";
 $lang["items_temp"] = "Temporal";
 $lang["items_type"] = "Tipo de ítem";
 $lang["items_unit_price"] = "Precio de Venta";
+$lang["items_unit_price_bs"] = "Precio de Venta Bs.";
 $lang["items_unit_price_number"] = "Precio de Venta debe ser número.";
 $lang["items_unit_price_required"] = "Precio de Venta es requerido.";
 $lang["items_upc_database"] = "Base de datos UPC";
