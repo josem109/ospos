@@ -499,19 +499,18 @@ class Sale_lib
 				$item_count++;
 				$total_units += $item['quantity'];
 			}
-			$discount_amount = $this->get_item_discount($item['quantity'], $item['price'], $item['discount'], $item['discount_type']);
-			$discount_amount = ($discount_amount * $currency_rate_alternative) / $currency_rate;
+			$discount_amount = $this->get_item_discount($item['quantity'], $item['price'], $item['discount'], $item['discount_type'], $currency_rate, $currency_rate_alternative);
+			//$discount_amount = ($discount_amount * $currency_rate_alternative) / $currency_rate;
 			$total_discount = bcadd($total_discount, $discount_amount);
 
 			$extended_amount = $this->get_extended_amount($item['quantity'], $item['price']);
-			$extended_amount = ($extended_amount * $currency_rate_alternative) / $currency_rate;
-			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], $item['price'], $discount_amount);
-			$extended_discounted_amount = ($extended_discounted_amount * $currency_rate_alternative) / $currency_rate;
+			$extended_amount = round(($extended_amount * $currency_rate_alternative) / $currency_rate, 2);
+			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], round(($item['price'] * $currency_rate_alternative) / $currency_rate, 2), $discount_amount);
 			$prediscount_subtotal= bcadd($prediscount_subtotal, $extended_amount);
 			$total = bcadd($total, $extended_discounted_amount);
 
 			$subtotal = bcadd($subtotal, $extended_discounted_amount);
-			$subtotal = $subtotal * $currency_rate;
+			//$subtotal = $subtotal * $currency_rate;
 		}
 
 		$totals['prediscount_subtotal'] = $prediscount_subtotal;
@@ -533,7 +532,7 @@ class Sale_lib
 
 		$totals['subtotal'] = $subtotal;
 		$totals['total'] = $total;
-		$totals['total2'] = $total * $currency_rate;
+		$totals['total2'] = round((($total * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
 		$totals['tax_total'] = $sales_tax;
 
 		$payment_total = $this->get_payments_total();
@@ -554,10 +553,10 @@ class Sale_lib
 
 		$amount_due = bcsub($total, $payment_total);
 		$totals['amount_due'] = $amount_due;
-		$totals['amount_due_ves'] = $amount_due * $currency_rate;
+		$totals['amount_due_ves'] = round((($amount_due * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
 		$cash_amount_due = bcsub($cash_total, $payment_total);
 		$totals['cash_amount_due'] = $cash_amount_due;
-		$totals['cash_amount_due_ves'] = $cash_amount_due * $currency_rate;
+		$totals['cash_amount_due_ves'] = round((($cash_amount_due * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
 
 		if($cash_mode)
 		{
@@ -1313,11 +1312,12 @@ class Sale_lib
 		return bcsub($extended_amount, $discount_amount);
 	}
 
-	public function get_item_discount($quantity, $price, $discount, $discount_type)
+	public function get_item_discount($quantity, $price, $discount, $discount_type, $currency_rate = 1.0, $currency_rate_alternative = 1.0)
 	{
 		$total = bcmul($quantity, $price);
 		if($discount_type == PERCENT)
 		{
+			$total = ($total * $currency_rate_alternative) / $currency_rate;
 			$discount = bcmul($total, bcdiv($discount, 100));
 		}
 		else

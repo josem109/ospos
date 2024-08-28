@@ -331,6 +331,7 @@ function get_items_manage_table_headers()
 		array('company_name' => $CI->lang->line('suppliers_company_name')),
 		array('cost_price' => $CI->lang->line('items_cost_price')),
 		array('unit_price' => $CI->lang->line('items_unit_price')),
+		array('unit_price_bs' => $CI->lang->line('items_unit_price_bs')),
 		array('quantity' => $CI->lang->line('items_quantity'))
 	);
 
@@ -360,7 +361,7 @@ function get_items_manage_table_headers()
 /*
 Get the html data row for the item
 */
-function get_item_data_row($item)
+function get_item_data_row($item, $currency_rate = 1.0, $currency_rate_alternative = 1.0)
 {
 	$CI =& get_instance();
 
@@ -419,6 +420,14 @@ function get_item_data_row($item)
 
 	$definition_names = $CI->Attribute->get_definitions_by_flags(Attribute::SHOW_IN_ITEMS);
 
+	// Convertir unit_price a número flotante, multiplicar por 40 y luego formatear
+	//$currency_rate = floatval($this->config->item('currency_rate'));
+	//$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
+	$unit_price = $item->unit_price;
+	$multiplied_unit_price = ($unit_price * $currency_rate_alternative) / $currency_rate;
+	$multiplied_unit_price_bs = $unit_price * $currency_rate_alternative;
+	$formatted_unit_price = to_currency($multiplied_unit_price);
+	$formatted_unit_price_bs = to_currency_bcv($multiplied_unit_price_bs);
 	$columns = array (
 		'items.item_id' => $item->item_id,
 		'item_number' => $item->item_number,
@@ -426,7 +435,8 @@ function get_item_data_row($item)
 		'category' => $item->category,
 		'company_name' => $item->company_name,
 		'cost_price' => to_currency($item->cost_price),
-		'unit_price' => to_currency($item->unit_price),
+		'unit_price' => $formatted_unit_price,
+		'unit_price_bs' => $formatted_unit_price_bs,
 		'quantity' => to_quantity_decimals($item->quantity),
 		'tax_percents' => !$tax_percents ? '-' : $tax_percents,
 		'item_pic' => $image

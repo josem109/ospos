@@ -112,6 +112,7 @@ $lang["items_tax_percents"] = "Tax Percent(s)";
 $lang["items_temp"] = "Temporary";
 $lang["items_type"] = "Item Type";
 $lang["items_unit_price"] = "Retail Price";
+$lang["items_unit_price_bs"] = "Retail Price Bs.";
 $lang["items_unit_price_number"] = "Unit price must be a number.";
 $lang["items_unit_price_required"] = "Retail Price is a required field.";
 $lang["items_upc_database"] = "Barcode Database";

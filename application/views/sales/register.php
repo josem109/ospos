@@ -253,7 +253,7 @@ if(isset($success))
 								<?php
 								if($items_module_allowed && $change_price)
 								{
-									$precio_multiplicado = ($item['price'] * $currency_rate_alternative) / $currency_rate;
+									$precio_multiplicado = round(($item['price'] * $currency_rate_alternative) / $currency_rate,2);
 									
 									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'style'=>'font-size: 10px', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
 
@@ -508,7 +508,7 @@ if(isset($success))
 			</tr>
 			<tr>
 				<th style="width: 55%;"><?php echo $this->lang->line('sales_sub_total'); ?></th>
-				<th style="width: 45%; text-align: right;"><?php echo to_currency_bcv($subtotal); ?></th>
+				<th style="width: 45%; text-align: right;"><?php echo to_currency_bcv(round((($subtotal * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative); ?></th>
 			</tr>
 
 			<?php
