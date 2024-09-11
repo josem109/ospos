@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fecha = date('Y-m-d', strtotime($valor2)); 
             $currency_symbol = 'USD';
             try {
-                $db = new PDO('mysql:host=localhost;dbname=osposam', 'root', '');
+                $db = new PDO('mysql:host=localhost;dbname=ospos', 'root', '');
                 date_default_timezone_set('America/Caracas');
                 $fecha_hoy = date('Y-m-d'); // Obtiene la fecha actual
                 $query = $db->prepare("SELECT currency_rate FROM `ospos_currencytable` WHERE `currency_symbol` = :currency_symbol AND `currency_date` = :currency_date");
@@ -66,6 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(['error' => 'Error al conectar con la base de datos: ' . $e->getMessage()]);
                 return;
                 }
+
+                            // Ejecutar el archivo .exe
+            $exePath = 'C:\\xampp\\htdocs\\ospos\\public\\inventory\\dolarparalelo.exe';
+            exec($exePath, $output, $return_var);
+            if ($return_var === 0) {
+                echo json_encode(['result' =>  $valor . " fecha: " . $fecha, 'exe_output' => implode("\n", $output)]);
+            } else {
+                echo json_encode(['error' => 'Error al ejecutar el archivo .exe. Código de retorno: ' . $return_var]);
+            }
 
             header('Access-Control-Allow-Origin: *');
             header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type');

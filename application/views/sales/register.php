@@ -509,7 +509,7 @@ if(isset($success))
 			</tr>
 			<tr>
 				<th style="width: 55%;"><?php echo $this->lang->line('sales_sub_total'); ?></th>
-				<th style="width: 45%; text-align: right;"><?php echo to_currency_bcv(round((($subtotal * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative); ?></th>
+				<th style="width: 45%; text-align: right;"><?php echo to_currency_bcv($subtotal2); ?></th>
 			</tr>
 
 			<?php

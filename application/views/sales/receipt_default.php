@@ -72,12 +72,19 @@
 			if($item['print_option'] == PRINT_YES)
 			{
 				$currency_rate = floatval($this->config->item('currency_rate'));
+				$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
 			?>
 				<tr>
 					<td><?php echo ucfirst($item['name'] . ' ' . $item['attribute_values']); ?></td>
-					<td><?php echo to_currency_bcv($item['price'] * $currency_rate); ?></td>
+					<td><?php echo to_currency_bcv($item['price_ves'] * $currency_rate_alternative); ?></td>
 					<td><?php echo to_quantity_decimals($item['quantity']); ?></td>
-					<td class="total-value"><?php echo to_currency_bcv($item[($this->config->item('receipt_show_total_discount') ? 'total' : 'discounted_total')] * $currency_rate); ?></td>
+					<td class="total-value">
+					<?php
+						 $calculated_total = $item['price_ves'] * $item['quantity'] * $currency_rate_alternative;
+						 $display_value = $this->config->item('receipt_show_total_discount') ? $calculated_total : $item['discounted_total'];
+						 echo to_currency_bcv($display_value);
+					 ?>
+					 </td>
 					<?php
 					if($this->config->item('receipt_show_tax_ind'))
 					{
@@ -176,16 +183,39 @@
 		<?php $border = (!$this->config->item('receipt_show_taxes') && !($this->config->item('receipt_show_total_discount') && $discount > 0)); ?>
 		<tr>
 			<td colspan="3" style="text-align:right;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo $this->lang->line('sales_total'); ?></td>
-			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total  * $currency_rate); ?></td>
+			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total2); ?></td>
 		</tr>
 
 		<tr>
 			<td colspan="4">&nbsp;</td>
 		</tr>
-
+		<!--<tr>
+			<td colspan="3" style="text-align:right;"><?php echo "Total Pago" ; ?> </td>
+			<td class="total-value">
+				<?php
+					/* if(isset($payments_total2))
+					{
+						$payments_total2 = $payments_total2;	
+					}
+					else
+					{
+						if($payments_cover_total == true)
+						{
+							$payments_total2 = $total2;
+						}
+						else
+						{
+							$payments_total2 = round($payments_total * $currency_rate,2);
+						}
+					}
+					echo to_currency_bcv( $payments_total2 * -1); */
+			  	?>
+			</td>
+		</tr>-->
 		<?php
 		$only_sale_check = FALSE;
 		$show_giftcard_remainder = FALSE;
+
 		foreach($payments as $payment_id=>$payment)
 		{
 			$only_sale_check |= $payment['payment_type'] == $this->lang->line('sales_check');
@@ -193,9 +223,13 @@
 			$show_giftcard_remainder |= $splitpayment[0] == $this->lang->line('sales_giftcard');
 		?>
 			<tr>
-				<td colspan="3" style="text-align:right;"><?php echo $splitpayment[0]; ?> </td>
-				<td class="total-value"><?php echo to_currency_bcv( $payment['payment_amount'] * -1  * $currency_rate); ?></td>
-			</tr>
+				<td colspan="3" style="text-align:right;">
+					<?php echo $splitpayment[0]; ?> 
+				</td>
+				<td class="total-value">
+					<?php echo to_currency_bcv( $payment['payment_amount'] * -1  * $currency_rate); ?>
+				</td>
+			</tr>-->
 		<?php
 		}
 		?>
@@ -217,7 +251,12 @@
 		?>
 		<tr>
 			<td colspan="3" style="text-align:right;"> <?php echo $this->lang->line($amount_change >= 0 ? ($only_sale_check ? 'sales_check_balance' : 'sales_change_due') : 'sales_amount_due') ; ?> </td>
-			<td class="total-value"><?php echo to_currency_bcv($amount_change * $currency_rate); ?></td>
+			<td class="total-value">
+				<?php
+					 //echo to_currency_bcv($amount_change * $currency_rate);
+					 echo to_currency_bcv($amount_change_ves);
+				?>
+			</td>
 		</tr>
 	</table>
 

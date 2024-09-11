@@ -376,6 +376,8 @@ class Sale_lib
 	 */
 	public function add_payment($payment_id, $payment_amount, $cash_adjustment = CASH_ADJUSTMENT_FALSE)
 	{
+		//$payment_amount = floor($payment_amount * 100) / 100;
+		//$payment_amount = round($payment_amount , 2);
 		$payments = $this->get_payments();
 		if(isset($payments[$payment_id]))
 		{
@@ -500,16 +502,18 @@ class Sale_lib
 				$total_units += $item['quantity'];
 			}
 			$discount_amount = $this->get_item_discount($item['quantity'], $item['price'], $item['discount'], $item['discount_type'], $currency_rate, $currency_rate_alternative);
-			//$discount_amount = ($discount_amount * $currency_rate_alternative) / $currency_rate;
+			//$discount_amount_ves = $this->get_item_discount($item['quantity'], $item['price'] * $currency_rate_alternative, $item['discount'], $item['discount_type'], $currency_rate, $currency_rate_alternative);
 			$total_discount = bcadd($total_discount, $discount_amount);
 
-			$extended_amount = $this->get_extended_amount($item['quantity'], $item['price']);
-			$extended_amount = round(($extended_amount * $currency_rate_alternative) / $currency_rate, 2);
-			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], round(($item['price'] * $currency_rate_alternative) / $currency_rate, 2), $discount_amount);
+			$extended_amount = $this->get_extended_amount($item['quantity'], round($item['price_ves'] * $currency_rate_alternative / $currency_rate,2));
+			//$extended_amount = round(($extended_amount * $currency_rate_alternative) / $currency_rate, 2);
+			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], round(($item['price_ves'] * $currency_rate_alternative) / $currency_rate, 2), $discount_amount);
+			$extended_discounted_amount_ves = $this->get_extended_amount($item['quantity'], round(($item['price_ves'] * $currency_rate_alternative), 2), $discount_amount_ves);
 			$prediscount_subtotal= bcadd($prediscount_subtotal, $extended_amount);
 			$total = bcadd($total, $extended_discounted_amount);
-
+			$total2 = bcadd($total2, $extended_discounted_amount_ves);
 			$subtotal = bcadd($subtotal, $extended_discounted_amount);
+			$subtotal2 = bcadd($subtotal2, $extended_discounted_amount_ves);
 			//$subtotal = $subtotal * $currency_rate;
 		}
 
@@ -531,12 +535,18 @@ class Sale_lib
 		}
 
 		$totals['subtotal'] = $subtotal;
+		$totals['subtotal2'] = $subtotal2;
 		$totals['total'] = $total;
-		$totals['total2'] = round((($total * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
+		$totals['total2'] = $total2;
 		$totals['tax_total'] = $sales_tax;
 
 		$payment_total = $this->get_payments_total();
+		$payment_total2 = round($payment_total * $currency_rate,2);
+		$payment_total = floor($payment_total * 100) / 100;
 		$totals['payment_total'] = $payment_total;
+		$totals['payment_total2'] = $payment_total2;
+		//$payment_total = round($payment_total, 2);
+		
 		$cash_rounding = $this->CI->session->userdata('cash_rounding');
 		$cash_mode = $this->CI->session->userdata('cash_mode');
 
@@ -548,15 +558,38 @@ class Sale_lib
 		else
 		{
 			$cash_total = $total;
+			$cash_total2 = $total2;
 			$totals['cash_total'] = $cash_total;
+			$totals['cash_total2'] = $cash_total2;
 		}
 
 		$amount_due = bcsub($total, $payment_total);
+		if($amount_due == 0)
+		{
+			$amount_due_ves = 0;
+			$totals['payment_total2'] = $subtotal2;
+			$payment_total2 = $subtotal2;
+		}
+		else
+		{
+			$amount_due_ves = bcsub($total2, $payment_total2);
+			if($amount_due_ves == 0)
+			{
+				$amount_due = 0;
+				$totals['payment_total'] = $subtotal;
+				$payment_total = $subtotal;
+			}
+		}
+		
 		$totals['amount_due'] = $amount_due;
-		$totals['amount_due_ves'] = round((($amount_due * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
+		$totals['amount_due_ves'] = $amount_due_ves;
+		//$totals['amount_due_ves'] = round((($amount_due * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
+		
 		$cash_amount_due = bcsub($cash_total, $payment_total);
+		$cash_amount_due2 = bcsub($cash_total2, $payment_total2);
+
 		$totals['cash_amount_due'] = $cash_amount_due;
-		$totals['cash_amount_due_ves'] = round((($cash_amount_due * $currency_rate) / $currency_rate_alternative), 2) * $currency_rate_alternative;
+		$totals['cash_amount_due_ves'] = $cash_amount_due2;
 
 		if($cash_mode)
 		{
@@ -763,8 +796,8 @@ class Sale_lib
 		$item_id = $item_info->item_id;
 		$item_type = $item_info->item_type;
 		$stock_type = $item_info->stock_type;
-
 		$price = $item_info->unit_price;
+		$price_ves = $item_info->unit_price;
 		$cost_price = $item_info->cost_price;
 		if($price_override != NULL)
 		{
@@ -901,8 +934,10 @@ class Sale_lib
 					'discount_type' => $discount_type,
 					'in_stock' => $this->CI->Item_quantity->get_item_quantity($item_id, $item_location)->quantity,
 					'price' => $price,
+					'price_ves' => $price_ves,
 					'cost_price' => $cost_price,
 					'total' => $total,
+					'total_ves' => $total,
 					'discounted_total' => $discounted_total,
 					'print_option' => $print_option_selected,
 					'stock_type' => $stock_type,
@@ -1366,6 +1401,7 @@ class Sale_lib
 	{
 		$total = $this->calculate_subtotal(TRUE);
 		$total = ($total * $currency_rate_alternative) / $currency_rate;
+		//$total = round($total, 2);
 		$cash_mode = $this->CI->session->userdata('cash_mode');
 
 		if(!$this->CI->config->item('tax_included'))
