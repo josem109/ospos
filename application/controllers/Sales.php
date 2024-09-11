@@ -364,7 +364,7 @@ class Sales extends Secure_Controller
 				$amount_tendered = $this->input->post('amount_tendered');
 				$amount_tendered_ves = $amount_tendered;
 				$amount_tendered = $amount_tendered  / $currency_rate;
-
+				//$amount_tendered = ceil($amount_tendered * 100) / 100;
 				$this->sale_lib->add_payment($payment_type, $amount_tendered);
 				$cash_adjustment_amount = $amount_due - $sales_total;
 				if($cash_adjustment_amount <> 0)
@@ -828,7 +828,8 @@ class Sales extends Secure_Controller
 			}
 			
 			foreach ($data['cart'] as &$item) {
-				$item['price'] = ($item['price'] * $currency_rate_alternative) / $currency_rate;
+				$item['price'] = ($item['price_ves'] * $currency_rate_alternative) / $currency_rate;
+				//$item['price_ves'] = ($item['price'] * $currency_rate_alternative) / $currency_rate;
 				$item['total'] = ($item['total'] * $currency_rate_alternative) / $currency_rate;
 				$item['discounted_total'] = ($item['discounted_total'] * $currency_rate_alternative) / $currency_rate;
 			}
@@ -1019,6 +1020,7 @@ class Sales extends Secure_Controller
 		$this->session->set_userdata('cash_adjustment_amount', $totals['cash_adjustment_amount']);
 		$data['subtotal'] = $totals['subtotal'];
 		$data['payments_total'] = $totals['payment_total'];
+		$data['payments_total2'] = $totals['payment_total2'];
 		$data['payments_cover_total'] = $totals['payments_cover_total'];
 		$data['cash_mode'] = $this->session->userdata('cash_mode');
 		$data['prediscount_subtotal'] = $totals['prediscount_subtotal'];
@@ -1142,8 +1144,10 @@ class Sales extends Secure_Controller
 		$data['item_count'] = $totals['item_count'];
 		$data['total_units'] = $totals['total_units'];
 		$data['subtotal'] = $totals['subtotal'];
+		$data['subtotal2'] = $totals['subtotal2'];
 		$data['total'] = $totals['total'];
 		$data['payments_total'] = $totals['payment_total'];
+		$data['payments_total2'] = $totals['payment_total2'];
 		$data['payments_cover_total'] = $totals['payments_cover_total'];
 
 		// cash_mode indicates whether this sale is going to be processed using cash_rounding

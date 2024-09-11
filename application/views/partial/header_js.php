@@ -72,7 +72,7 @@ function actualizarPagina() {
   			let minuto = ahora.getMinutes();
   			let segundo = ahora.getSeconds();
 		
-  if (hora == 16 && minuto == 15 && segundo == 00) {
+  if ((hora == 16 && minuto == 15 && segundo == 00) || (hora == 13 && minuto == 05 && segundo == 00)) {
 	$("#miAlerta").show();
 	//obtener_valor_dolar('https://www.bcv.org.ve/');
 	jQuery.ajax({
