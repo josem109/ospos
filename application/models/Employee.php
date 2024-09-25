@@ -319,10 +319,32 @@ class Employee extends Person
 
 		return $this->db->get();
 	}
+	public function get_comments($person_id)
+	{
+		// Selecciona solo el campo 'comments' de la tabla 'people'
+		$this->db->select('comments');
+		$this->db->from('people');
+		$this->db->where('person_id', $person_id);
+		$query = $this->db->get();
+	
+		// Verifica si se encontró el registro
+		if ($query->num_rows() == 1)
+		{
+			// Retorna el campo 'comments' del resultado
+			return $query->row()->comments;
+		}
+		else
+		{
+			// Si no se encuentra el registro, retorna NULL o algún valor por defecto
+			return NULL;
+		}
+	}
+	
 
 	/*
 	Attempts to login employee and set session. Returns boolean based on outcome.
 	*/
+	
 	public function login($username, $password)
 	{
 		$query = $this->db->get_where('employees', array('username' => $username, 'deleted' => 0), 1);
@@ -342,6 +364,9 @@ class Employee extends Person
 			}
 			elseif($row->hash_version === '2' && password_verify($password, $row->password))
 			{
+				$person_id = $row->person_id;
+				$role = $this->Employee->get_comments($person_id);
+				$this->session->set_userdata('role', $role);
 				$this->session->set_userdata('person_id', $row->person_id);
 
 				return TRUE;

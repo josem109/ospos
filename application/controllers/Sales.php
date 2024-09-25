@@ -517,7 +517,9 @@ class Sales extends Secure_Controller
 
 		if($this->form_validation->run() != FALSE)
 		{
-			$this->sale_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $discounted_total);
+			//$full_price = round($price * $currency_rate_alternative / $currency_rate, 2);
+			//$this->sale_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $discounted_total);
+			$this->sale_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $discounted_total, $currency_rate, $currency_rate_alternative);
 			
 			$this->sale_lib->empty_payments();
 		}
@@ -527,8 +529,14 @@ class Sales extends Secure_Controller
 			$data['error'] = $this->lang->line('sales_error_editing_item');
 		}
 
-		$data['warning'] = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
-	
+		$stock_warning = $this->sale_lib->out_of_stock($this->sale_lib->get_item_id($item_id), $item_location);
+		if($stock_warning == 'Advertencia. La cantidad deseada no tiene stock suficiente.')
+		{
+			$data['error'] = $stock_warning;
+		}else if ($stock_warning == 'Advertencia. La cantidad disponible es menor al stock de seguridad.')
+		{
+			$data['warning'] = $stock_warning;
+		}
 		$this->_reload($data);
 	}
 
@@ -818,8 +826,8 @@ class Sales extends Secure_Controller
 			foreach ($data['cart'] as &$item) {
 				$item['price'] = ($item['price_ves'] * $currency_rate_alternative) / $currency_rate;
 				//$item['price_ves'] = ($item['price'] * $currency_rate_alternative) / $currency_rate;
-				$item['total'] = ($item['total'] * $currency_rate_alternative) / $currency_rate;
-				$item['discounted_total'] = ($item['discounted_total'] * $currency_rate_alternative) / $currency_rate;
+				//$item['total'] = ($item['total'] * $currency_rate_alternative) / $currency_rate;
+				//$item['discounted_total'] = ($item['discounted_total'] * $currency_rate_alternative) / $currency_rate;
 			}
 
 

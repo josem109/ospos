@@ -64,7 +64,7 @@ function get_sales_manage_table_headers()
 		array('sale_id' => $CI->lang->line('common_id')),
 		array('sale_time' => $CI->lang->line('sales_sale_time')),
 		array('customer_name' => $CI->lang->line('customers_customer')),
-		array('amount_due' => $CI->lang->line('sales_amount_due')),
+		array('amount_due' => $CI->lang->line('sales_sales_total')),
 		array('amount_tendered' => $CI->lang->line('sales_amount_tendered')),
 		array('change_due' => $CI->lang->line('sales_change_due')),
 		array('payment_type' => $CI->lang->line('sales_payment_type'))
@@ -441,18 +441,21 @@ function get_item_data_row($item, $currency_rate = 1.0, $currency_rate_alternati
 		'tax_percents' => !$tax_percents ? '-' : $tax_percents,
 		'item_pic' => $image
 	);
-
-	$icons = array(
-		'inventory' => anchor($controller_name."/inventory/$item->item_id", '<span class="glyphicon glyphicon-pushpin"></span>',
-			array('class' => 'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_count'))
-		),
-		'stock' => anchor($controller_name."/count_details/$item->item_id", '<span class="glyphicon glyphicon-list-alt"></span>',
-			array('class' => 'modal-dlg', 'title' => $CI->lang->line($controller_name.'_details_count'))
-		),
-		'edit' => anchor($controller_name."/view/$item->item_id", '<span class="glyphicon glyphicon-edit"></span>',
-			array('class' => 'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
-		)
-	);
+	if ($_SESSION['role'] == 'admin') {
+		$icons = array(
+			'inventory' => anchor($controller_name."/inventory/$item->item_id", '<span class="glyphicon glyphicon-pushpin"></span>',
+				array('class' => 'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_count'))
+			),
+			'stock' => anchor($controller_name."/count_details/$item->item_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+				array('class' => 'modal-dlg', 'title' => $CI->lang->line($controller_name.'_details_count'))
+			),
+			'edit' => anchor($controller_name."/view/$item->item_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class' => 'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
+			)
+		);
+	} else {
+		$icons = array(); // Íconos invisibles
+	}
 
 	return $columns + expand_attribute_values($definition_names, (array) $item) + $icons;
 
