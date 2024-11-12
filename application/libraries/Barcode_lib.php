@@ -45,7 +45,7 @@ class Barcode_lib
 		$data['barcode_page_cellspacing'] = $this->CI->config->item('barcode_page_cellspacing');
 		$data['barcode_generate_if_empty'] = $this->CI->config->item('barcode_generate_if_empty');
 		$data['barcode_formats'] = $this->CI->config->item('barcode_formats');
-
+		$data['date_format'] = 'ymd';
 		return $data;
 	}
 
@@ -109,11 +109,14 @@ class Barcode_lib
 			if($barcode_config['barcode_generate_if_empty'])
 			{
 				// generate barcode with the correct instance
-				$seed = $barcode_instance->generate($seed);
+				$seed = '1' . $barcode_instance->generate($seed);
+				//$seed = $barcode_instance->generate($seed);
+				//$seed .= ''date($barcode_config['date_format'])'';
 			}
 			else
 			{
 				$seed = $item['item_id'];
+				$seed .= date($barcode_config['date_format']);
 			}
 		}
 		return $seed;
@@ -166,8 +169,9 @@ class Barcode_lib
 		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_first_row'], $item, $barcode_config) . "</td></tr>";
 		$barcode = $this->generate_barcode($item, $barcode_config);
 		$display_table .= "<tr><td align='center'><img src='data:image/png;base64,$barcode' /></td></tr>";
-		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_second_row'], $item, $barcode_config) . "</td></tr>";
-		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_third_row'], $item, $barcode_config) . "</td></tr>";
+		//$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_second_row'], $item, $barcode_config) . "</td></tr>";
+		//$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_third_row'], $item, $barcode_config) . "</td></tr>";
+		$display_table .= "<tr><td align='center'>" . $item["item_number"] . "</td></tr>";
 		$display_table .= "</table>";
 
 		return $display_table;
@@ -179,7 +183,8 @@ class Barcode_lib
 
 		if($layout_type == 'name')
 		{
-			$result = $this->CI->lang->line('items_name') . " " . $item['name'];
+			//$result = $this->CI->lang->line('items_name') . " " . $item['name'];
+			$result = $item['name'];
 		}
 		elseif($layout_type == 'category' && isset($item['category']))
 		{

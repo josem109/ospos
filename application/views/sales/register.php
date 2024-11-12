@@ -8,11 +8,8 @@
             $('#refresh_bcv_button').click(function() {
 				$("#miAlerta").show();
 				event.preventDefault();
-				//window.location.href = 'http://localhost/ospos/public/sales';
-                actualizarPaginaBoton();
-				//window.location.href = 'http://localhost/ospos/public/sales';
-				//alert('Se ha actualizado la tasa de cambio!');
-				//location.reload();
+				actualizarPaginaBoton();
+				
             });
         });
 		//Pinto 06/06/2024
