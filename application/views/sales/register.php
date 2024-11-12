@@ -15,7 +15,6 @@
 		//Pinto 06/06/2024
 		//Pinto 06/06/2024
     </script>
-
 <?php
 echo '
 <div id="miAlerta" style="display: none; position: fixed; width: 100%; height: 100%; top: 0; left: 0; background: rgba(0,0,0,0.5); color: white; text-align: center; padding-top: 20%; z-index: 9999;">
