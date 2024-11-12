@@ -31,11 +31,10 @@ function actualizarPaginaBoton() {
     dataType: 'json',
     data: {functionname: 'getDolar'},
     success: function (obj, textstatus) {
-		//alert('Solicitud AJAX realizada.');
-				  //alert('exito');
+		
 		          if( !('error' in obj) ) {
                       yourVariable = obj.result;
-					  alert(obj.result);
+					  alert('Tasa Actualizada!');
 					  $("#miAlerta").hide();
 					  location.reload();
 					  window.location.href = 'http://localhost/ospos/public/sales';

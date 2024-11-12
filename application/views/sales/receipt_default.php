@@ -81,7 +81,13 @@
 					<td class="total-value">
 					<?php
 						 $calculated_total = $item['price_ves'] * $item['quantity'] * $currency_rate_alternative;
-						 $display_value = $this->config->item('receipt_show_total_discount') ? $calculated_total : $item['discounted_total'];
+						 if ($item["discount"] == 0) 
+						 {
+							$display_value = $calculated_total;
+						 }else {
+							$display_value = $this->config->item('receipt_show_total_discount') ? $calculated_total : round($item['discounted_total'] * $currency_rate,2);
+						 }
+						 
 						 echo to_currency_bcv($display_value);
 					 ?>
 					 </td>
@@ -160,7 +166,7 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
-				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency_bcv($subtotal  * $currency_rate); ?></td>
+				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency_bcv($total2); ?></td>
 			</tr>
 			<?php
 			foreach($taxes as $tax_group_index=>$tax)
@@ -227,7 +233,12 @@
 					<?php echo $splitpayment[0]; ?> 
 				</td>
 				<td class="total-value">
-					<?php echo to_currency_bcv( $payment['payment_amount'] * -1  * $currency_rate); ?>
+					<?php
+						 //pago total
+						 //echo to_currency_bcv( $payments_total2 * -1 );
+						 echo to_currency_bcv( $payment['payment_amount'] * -1  * $currency_rate);
+					?>
+					
 				</td>
 			</tr>-->
 		<?php

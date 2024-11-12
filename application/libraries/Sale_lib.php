@@ -507,8 +507,15 @@ class Sale_lib
 
 			$extended_amount = $this->get_extended_amount($item['quantity'], round($item['price_ves'] * $currency_rate_alternative / $currency_rate,2));
 			//$extended_amount = round(($extended_amount * $currency_rate_alternative) / $currency_rate, 2);
+			if ($item['discount'] == 0)
+			{
+				$extended_discounted_amount_ves = round($item['quantity'] * $item['price_ves'] * $currency_rate_alternative,2);
+			}else {
+				$extended_discounted_amount_ves = round($item["discounted_total"] * $currency_rate,2);
+			}
 			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], round(($item['price_ves'] * $currency_rate_alternative) / $currency_rate, 2), $discount_amount);
-			$extended_discounted_amount_ves = $this->get_extended_amount($item['quantity'], round(($item['price_ves'] * $currency_rate_alternative), 2), $discount_amount_ves);
+			//$extended_discounted_amount_ves = $this->get_extended_amount($item['quantity'], round(($item['price_ves'] * $currency_rate_alternative), 2), $discount_amount_ves);
+			
 			$prediscount_subtotal= bcadd($prediscount_subtotal, $extended_amount);
 			$total = bcadd($total, $extended_discounted_amount);
 			$total2 = bcadd($total2, $extended_discounted_amount_ves);
@@ -1053,7 +1060,7 @@ class Sale_lib
 		return -1;
 	}
 
-	public function edit_item($line, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $discounted_total=NULL)
+	public function edit_item($line, $description, $serialnumber, $quantity, $discount, $discount_type, $price, $discounted_total=NULL, $currency_rate = 1.0, $currency_rate_alternative = 1.0)
 	{
 		$items = $this->get_cart();
 		if(isset($items[$line]))
@@ -1072,9 +1079,12 @@ class Sale_lib
 			{
 				$line['discount_type'] = $discount_type;
 			}
+			$full_price = round($price * $currency_rate_alternative / $currency_rate,2);
 			$line['price'] = $price;
-			$line['total'] = $this->get_item_total($quantity, $price, $discount, $line['discount_type']);
-			$line['discounted_total'] = $this->get_item_total($quantity, $price, $discount, $line['discount_type'], TRUE);
+			//$line['total'] = $this->get_item_total($quantity, $price, $discount, $line['discount_type']);
+			//$line['discounted_total'] = $this->get_item_total($quantity, $price, $discount, $line['discount_type'], TRUE);
+			$line['total'] = $this->get_item_total($quantity, $full_price, $discount, $line['discount_type']);
+			$line['discounted_total'] = $this->get_item_total($quantity, $full_price, $discount, $line['discount_type'], TRUE);
 			$this->set_cart($items);
 		}
 

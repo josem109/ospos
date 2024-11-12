@@ -8,11 +8,8 @@
             $('#refresh_bcv_button').click(function() {
 				$("#miAlerta").show();
 				event.preventDefault();
-				//window.location.href = 'http://localhost/ospos/public/sales';
-                actualizarPaginaBoton();
-				//window.location.href = 'http://localhost/ospos/public/sales';
-				//alert('Se ha actualizado la tasa de cambio!');
-				//location.reload();
+				actualizarPaginaBoton();
+				
             });
         });
 		//Pinto 06/06/2024
@@ -299,7 +296,14 @@ if(isset($success))
 								}
 								else
 								{
-									$total_line_bs = ($item['discounted_total'] * $currency_rate_alternative);
+									if($item["discount"] == 0)
+									{
+										//$total_line_bs = (round($item['discounted_total'],2) * $currency_rate);
+										$total_line_bs = round($item['price'] * $item['quantity'] * $currency_rate_alternative,2);
+									} else {
+										$total_line_bs = (round($item['discounted_total'],2) * $currency_rate);
+									}
+									
 									/*echo to_currency($item['discounted_total']);*/
 									echo to_currency_bcv($total_line_bs);
 								}
@@ -1069,6 +1073,67 @@ $(document).ready(function()
 		$('#cart_'+ $(this).attr('data-line')).append($(input));
 		$('#cart_'+ $(this).attr('data-line')).submit();
 	});
+
+	var isStockSufficient = true; // Ajusta esta variable según la lógica de tu backend
+	// Iniciar un arreglo vacío en JavaScript para almacenar los elementos del carrito
+	var cart = [];
+
+	// Utilizar PHP para recorrer el arreglo del carrito y llenar el arreglo de JavaScript
+	var isStockSufficient = true; // Asumimos que el stock es suficiente al inicio
+
+	<?php if (isset($_ci_vars["cart"]) && is_array($_ci_vars["cart"])): ?>
+		<?php foreach ($_ci_vars["cart"] as $index => $item): ?>
+			// Verificar si la cantidad solicitada es mayor que el inventario disponible
+			<?php if ($item['quantity'] > $item['in_stock']): ?>
+				var isStockSufficient = false; // Cambia a false si no hay suficiente stock
+			<?php endif; ?>
+		
+			// Agregar cada ítem al arreglo de JavaScript utilizando PHP para generar el contenido
+			cart.push({
+				item_id: "<?php echo $item['item_id']; ?>",
+				name: "<?php echo addslashes($item['name']); ?>", // Usar addslashes para manejar caracteres especiales
+				quantity: "<?php echo $item['quantity']; ?>",
+				in_stock: "<?php echo $item['in_stock']; ?>"
+			});
+		<?php endforeach; ?>
+	<?php endif; ?>
+
+	// Mostrar el contenido del carrito en la consola para verificar
+	console.log("Carrito desde CodeIgniter:", cart);
+
+	// Recorrer el carrito en JavaScript para mostrar o manipular los datos
+	cart.forEach(function(item, index) {
+		console.log("Ítem " + index + ":");
+		console.log("ID del producto:", item.item_id);
+		console.log("Nombre del producto:", item.name);
+		console.log("Cantidad:", item.quantity);
+		console.log("Inventario:", item.in_stock);
+	});
+	// Selecciona el botón usando su ID
+	var addPaymentButton = document.getElementById('add_payment_button');
+	var errorMessage = <?php echo json_encode(isset($_ci_vars["error"]) ? $_ci_vars["error"] : ''); ?>;
+
+        // Mostrar el valor en la consola para verificar
+    console.log("Error desde CodeIgniter:", errorMessage);
+
+        // Ejemplo de uso de la variable
+    if (errorMessage) {
+    	alert("Error: " + errorMessage);
+    }
+
+	// Configura el botón para estar deshabilitado si no hay stock suficiente
+	if (!isStockSufficient) {
+			addPaymentButton.disabled = true; // Deshabilita el botón
+			addPaymentButton.classList.add('disabled'); // Agrega la clase 'disabled' para cambiar el estilo
+			addPaymentButton.setAttribute('aria-disabled', 'true'); // Indica accesibilidad para que se vea como deshabilitado
+			addPaymentButton.title = 'Stock insuficiente, no puede continuar con la facturación.'; // Agrega un mensaje informativo
+			// Prevenir clics en el botón para asegurar que no se active ninguna función
+			addPaymentButton.addEventListener('click', function(event) {
+			event.preventDefault(); // Evita la acción predeterminada del botón
+			event.stopPropagation(); // Detiene la propagación del evento
+			alert('El botón está deshabilitado porque no hay stock suficiente.');
+		}, true);
+	}
 });
 
 function check_payment_type()
@@ -1182,6 +1247,9 @@ document.body.onkeyup = function(e)
 			break;		  
     }
 }
+
+// Simulación de la variable que indica si el stock es suficiente
+
 
 
 
