@@ -89,9 +89,15 @@ $(document).ready(function()
 
 <div id="toolbar">
     <div class="pull-left form-inline" role="toolbar">
+    <?php
+        if ($_SESSION['role'] == 'admin') {
+    ?>
         <button id="delete" class="btn btn-default btn-sm print_hide">
             <span class="glyphicon glyphicon-trash">&nbsp;</span><?php echo $this->lang->line('common_delete'); ?>
         </button>
+     <?php
+     }
+    ?>
         <button id="bulk_edit" class="btn btn-default btn-sm modal-dlg print_hide", data-btn-submit='<?php echo $this->lang->line('common_submit') ?>', data-href='<?php echo site_url("$controller_name/bulk_edit"); ?>'
 				title='<?php echo $this->lang->line('items_edit_multiple_items'); ?>'>
             <span class="glyphicon glyphicon-edit">&nbsp;</span><?php echo $this->lang->line("items_bulk_edit"); ?>

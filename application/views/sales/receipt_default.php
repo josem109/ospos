@@ -76,19 +76,19 @@
 			?>
 				<tr>
 					<td><?php echo ucfirst($item['name'] . ' ' . $item['attribute_values']); ?></td>
-					<td><?php echo to_currency_bcv($item['price_ves'] * $currency_rate_alternative); ?></td>
+					<td><?php echo to_currency($item['price']); ?></td>
 					<td><?php echo to_quantity_decimals($item['quantity']); ?></td>
 					<td class="total-value">
 					<?php
-						 $calculated_total = $item['price_ves'] * $item['quantity'] * $currency_rate_alternative;
+						 $calculated_total = $item['price'] * $item['quantity'];
 						 if ($item["discount"] == 0) 
 						 {
 							$display_value = $calculated_total;
 						 }else {
-							$display_value = $this->config->item('receipt_show_total_discount') ? $calculated_total : round($item['discounted_total'] * $currency_rate,2);
+							$display_value = $this->config->item('receipt_show_total_discount') ? $calculated_total : round($item['discounted_total'] ,2);
 						 }
 						 
-						 echo to_currency_bcv($display_value);
+						 echo to_currency($display_value);
 					 ?>
 					 </td>
 					<?php
@@ -126,7 +126,7 @@
 						if($item['discount_type'] == FIXED)
 						{
 						?>
-							<td colspan="3" class="discount"><?php echo to_currency_bcv($item['discount']  * $currency_rate) . " " . $this->lang->line("sales_discount") ?></td>
+							<td colspan="3" class="discount"><?php echo to_currency($item['discount']) . " " . $this->lang->line("sales_discount") ?></td>
 						<?php
 						}
 						elseif($item['discount_type'] == PERCENT)
@@ -136,7 +136,7 @@
 						<?php
 						}	
 						?>
-						<td class="total-value"><?php echo to_currency_bcv($item['discounted_total'] * $currency_rate); ?></td>
+						<td class="total-value"><?php echo to_currency($item['discounted_total']); ?></td>
 					</tr>
 				<?php
 				}
@@ -150,11 +150,11 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
-				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency_bcv($prediscount_subtotal  * $currency_rate); ?></td>
+				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency($prediscount_subtotal); ?></td>
 			</tr>
 			<tr>
 				<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_customer_discount'); ?>:</td>
-				<td class="total-value"><?php echo to_currency_bcv($discount * -1  * $currency_rate); ?></td>
+				<td class="total-value"><?php echo to_currency($discount * -1); ?></td>
 			</tr>
 		<?php
 		}
@@ -166,7 +166,7 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
-				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency_bcv($total2); ?></td>
+				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency($total); ?></td>
 			</tr>
 			<?php
 			foreach($taxes as $tax_group_index=>$tax)
@@ -189,7 +189,7 @@
 		<?php $border = (!$this->config->item('receipt_show_taxes') && !($this->config->item('receipt_show_total_discount') && $discount > 0)); ?>
 		<tr>
 			<td colspan="3" style="text-align:right;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo $this->lang->line('sales_total'); ?></td>
-			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total2); ?></td>
+			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency($total); ?></td>
 		</tr>
 
 		<tr>
@@ -236,7 +236,7 @@
 					<?php
 						 //pago total
 						 //echo to_currency_bcv( $payments_total2 * -1 );
-						 echo to_currency_bcv( $payment['payment_amount'] * -1  * $currency_rate);
+						 echo to_currency( $payment['payment_amount'] * -1 );
 					?>
 					
 				</td>
@@ -255,7 +255,7 @@
 		?>
 			<tr>
 				<td colspan="3" style="text-align:right;"><?php echo $this->lang->line('sales_giftcard_balance'); ?></td>
-				<td class="total-value"><?php echo to_currency_bcv($cur_giftcard_value  * $currency_rate); ?></td>
+				<td class="total-value"><?php echo to_currency($cur_giftcard_value); ?></td>
 			</tr>
 		<?php
 		}
@@ -265,7 +265,7 @@
 			<td class="total-value">
 				<?php
 					 //echo to_currency_bcv($amount_change * $currency_rate);
-					 echo to_currency_bcv($amount_change_ves);
+					 echo to_currency($amount_change);
 				?>
 			</td>
 		</tr>
