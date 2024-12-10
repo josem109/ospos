@@ -1,5 +1,30 @@
 
 <script type="text/javascript">
+	function actualizarPaginaConTasas(bcvValue, altValue) {
+		// Aquí utilizas bcvValue y altValue
+		jQuery.ajax({
+			type: "POST",
+			url: 'http://localhost/ospos/public/dolarupdate.php',
+			dataType: 'json',
+			data: {
+				functionname: 'updateRates',
+				bcv: bcvValue,
+				alt: altValue
+			},
+			success: function (obj, textstatus) {
+				if (!('error' in obj)) {
+					alert('Tasa Actualizada en la Base de Datos!');
+				} else {
+					console.log(obj.error);
+					alert(obj.error);
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log('Error: ' + textStatus + ' ' + errorThrown);
+			}
+		});
+	}
+
 	function obtener_valor_dolar(url) {
     // Obtener el contenido de la página web
 	

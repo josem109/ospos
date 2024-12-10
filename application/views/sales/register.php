@@ -5,12 +5,49 @@
 
 
         
-            $('#refresh_bcv_button').click(function() {
-				$("#miAlerta").show();
-				event.preventDefault();
-				actualizarPaginaBoton();
-				
-            });
+            $('#refresh_bcv_button').click(function(event) {
+				// Obtener los valores de los campos
+				var bcvValue = $('#sales_currency_bcv').val().trim();
+				var altValue = $('#sales_currency_alternative').val().trim();
+
+				// Caso 1: Ambos vacíos
+				if (bcvValue === '' && altValue === '') {
+					$("#miAlerta").show();
+					event.preventDefault();
+					actualizarPaginaBoton();
+					return;
+				}
+
+				// Caso 2: Uno con valor y el otro vacío
+				if ((bcvValue !== '' && altValue === '') || (bcvValue === '' && altValue !== '')) {
+					alert("Para refrescar la tasa debes ingresar la tasa de cambio BCV y la tasa de cambio Paralela");
+					return;
+				}
+
+				// Caso 3: Ambos tienen valor
+				// Expresión regular para validar formato moneda (ej: 55 o 55.78)
+				var currencyRegex = /^\d+(\.\d{1,2})?$/;
+				var errorMessages = [];
+
+				if (!currencyRegex.test(bcvValue)) {
+					errorMessages.push('El campo BCV no tiene un formato válido. Debe tener el siguiente formato ##.##');
+				}
+
+				if (!currencyRegex.test(altValue)) {
+					errorMessages.push('El campo Paralelo no tiene un formato válido. Debe tener el siguiente formato ##.##');
+				}
+
+				// Si hay errores, mostrarlos
+				if (errorMessages.length > 0) {
+					alert(errorMessages.join('\n'));
+				} else {
+					// Ambos válidos
+					alert('Los campos BCV y Paralelo tienen formato válido.');
+					actualizarPaginaConTasas(bcvValue, altValue);
+				}
+			});
+
+
         });
 		//Pinto 06/06/2024
 		//Pinto 06/06/2024
@@ -111,11 +148,21 @@ if(isset($success))
 					<?php echo form_input(array('name'=>'item', 'id'=>'item', 'class'=>'form-control input-sm', 'size'=>'50', 'tabindex'=>++$tabindex)); ?>
 					<span class="ui-helper-hidden-accessible" role="status"></span>
 				</li>
-				<li class="pull-right">
+				</li>
+				</p>
+				<li class="pull-left" style="margin-left: 1px;">
+					<label for="sales_currency_bcv" class='control-label'><?php echo $this->lang->line('sales_currency_bcv'); ?></label>
+					<input type="text" name="sales_currency_bcv" id="sales_currency_bcv" class="form-control input-sm" size="10" style="display:inline-block;width:auto;margin-left: 10px;" />
+					<label for="sales_currency_alternative" class='control-label'><?php echo $this->lang->line('sales_currency_alternative'); ?></label>
+        			<input type="text" name="sales_currency_alternative" id="sales_currency_alternative" class="form-control input-sm" size="10" style="display:inline-block;width:auto;margin-left: 10px;" />
+				</li>
+				<li class="pull-right" style="margin-left: 0px;">
+					
 					<button id='new_item_button' class='btn btn-info btn-sm pull-right modal-dlg' data-btn-new="<?php echo $this->lang->line('common_new') ?>" data-btn-submit="<?php echo $this->lang->line('common_submit')?>" data-href="<?php echo site_url("items/view"); ?>"
 							title="<?php echo $this->lang->line($controller_name . '_new_item'); ?>">
 						<span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_new_item'); ?>
 					</button>
+					
 					<button id="refresh_bcv_button" class='btn btn-info btn-sm pull-right'>
 						<span class="glyphicon glyphicon-usd">&nbsp</span><?php echo $this->lang->line('refresh_currency'); ?>
 					</button>
@@ -136,6 +183,8 @@ if(isset($success))
 				?>
 				</span>
 		</p>
+
+		
 		<!-- End Pinto 08/28/2023 -->		
 	<?php echo form_close(); ?>
 
