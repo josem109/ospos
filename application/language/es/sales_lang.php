@@ -150,6 +150,7 @@ $lang["sales_not_authorized"] = "Esta accion no esta autorizada.";
 $lang["sales_one_or_multiple"] = "venta(s)";
 $lang["sales_payment"] = "Tipo de Pago";
 $lang["sales_payment_amount"] = "Cantidad";
+$lang["sales_payment_debt_amount"] = "Abono";
 $lang["sales_payment_not_cover_total"] = "La Cantidad Recibida no cubre el pago total.";
 $lang["sales_payment_type"] = "Tipo";
 $lang["sales_payments"] = "Pagos";

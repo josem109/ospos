@@ -132,7 +132,53 @@
 				<?php echo form_hidden('employee_id', $selected_employee_id);?>
 			</div>
 		</div>
-		
+
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('sales_payment_debt_amount'), 'employee', array('class'=>'control-label col-xs-3')); ?>
+			<div class='col-xs-6'>
+				<?php echo form_input(array(
+					'name'=>'sales_payment_amount', 
+					'value'=>$payment_amount, 
+					'id'=>'payment_amount', 
+					'class'=>'form-control input-sm', 
+					'size'=>'8', // Ajuste del ancho del campo
+					'width'=>'30'
+				));?>
+				<?php echo form_hidden('payment_amount', $payment_amount);?>
+				
+			</div>
+			<div class='col-xs-2'>
+				<span class="input-group-btn">
+					<button class="btn btn-default btn-sm" type="button" id="add_payment_button" style="background: transparent; border: none;">
+						<span class="glyphicon glyphicon-plus" style="color: #18bc9c;"></span>
+					</button>
+            	</span>
+			</div>	
+		</div>
+		<table class="table table-bordered table-striped table-condensed" id="payment_abonos_table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Fecha Abono</th>
+					<th>Monto</th>
+					<th>Reportado por</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>2024-12-01</td>
+					<td>100.00</td>
+					<td>admin</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>2024-12-05</td>
+					<td>200.00</td>
+					<td>admin</td>
+				</tr>
+			</tbody>
+		</table>
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('sales_comment'), 'comment', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
@@ -244,5 +290,41 @@ $(document).ready(function()
 			invoice_number: "<?php echo $this->lang->line("sales_invoice_number_duplicate"); ?>"
 		}
 	}, form_support.error));
+
+	$('#add_payment_button').click(function() {
+        var pAmount = $('#payment_amount').val().trim();
+        
+        // 1. Validar que no esté vacío
+        if (pAmount === '') {
+            alert('Debe ingresar un monto para abonar a esta factura');
+            return;
+        }
+
+        // 2. Validar el formato ##.## (numérico con opcional hasta 2 decimales)
+        var currencyRegex = /^\d+(\.\d{1,2})?$/;
+        if (!currencyRegex.test(pAmount)) {
+            alert('Debe ingresar un abono con el formato correcto, el formato correcto debe ser ##.##');
+            return;
+        }
+
+        // 3. Si pasa las validaciones, agregar la fila a la tabla
+        var today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        // Asignamos un ID ficticio, por ejemplo el siguiente registro sería 3.
+        // Podrías implementarlo para que se calcule dinámicamente.
+        var newId = 3;
+
+        $('#payment_abonos_table tbody').append(
+            '<tr>' +
+                '<td>' + newId + '</td>' +
+                '<td>' + today + '</td>' +
+                '<td>' + pAmount + '</td>' +
+                '<td>admin</td>' +
+            '</tr>'
+        );
+
+        // Opcionalmente, podrías limpiar el campo después de agregar el registro:
+        $('#payment_amount').val('');
+    });
+
 });
 </script>
