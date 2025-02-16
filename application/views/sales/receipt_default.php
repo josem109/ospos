@@ -76,11 +76,19 @@
 			?>
 				<tr>
 					<td><?php echo ucfirst($item['name'] . ' ' . $item['attribute_values']); ?></td>
+<<<<<<< HEAD
 					<td><?php echo to_currency_bcv($item['price'] * $currency_rate); ?></td>
 					<td><?php echo to_quantity_decimals($item['quantity']); ?></td>
 					<td class="total-value">
 					<?php
 						 $calculated_total = $item['price'] * $item['quantity'] * $currency_rate;
+=======
+					<td><?php echo to_currency_bcv($item['price_ves'] * $currency_rate_alternative); ?></td>
+					<td><?php echo to_quantity_decimals($item['quantity']); ?></td>
+					<td class="total-value">
+					<?php
+						 $calculated_total = $item['price_ves'] * $item['quantity'] * $currency_rate_alternative;
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 						 if ($item["discount"] == 0) 
 						 {
 							$display_value = $calculated_total;
@@ -126,7 +134,11 @@
 						if($item['discount_type'] == FIXED)
 						{
 						?>
+<<<<<<< HEAD
 							<td colspan="3" class="discount"><?php echo to_currency_bcv($item['discount'] * $currency_rate) . " " . $this->lang->line("sales_discount") ?></td>
+=======
+							<td colspan="3" class="discount"><?php echo to_currency_bcv($item['discount']  * $currency_rate) . " " . $this->lang->line("sales_discount") ?></td>
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 						<?php
 						}
 						elseif($item['discount_type'] == PERCENT)
@@ -150,11 +162,19 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
+<<<<<<< HEAD
 				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency_bcv($prediscount_subtotal * $currency_rate); ?></td>
 			</tr>
 			<tr>
 				<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_customer_discount'); ?>:</td>
 				<td class="total-value"><?php echo to_currency_bcv($discount * $currency_rate * -1); ?></td>
+=======
+				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency_bcv($prediscount_subtotal  * $currency_rate); ?></td>
+			</tr>
+			<tr>
+				<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_customer_discount'); ?>:</td>
+				<td class="total-value"><?php echo to_currency_bcv($discount * -1  * $currency_rate); ?></td>
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 			</tr>
 		<?php
 		}
@@ -166,7 +186,11 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
+<<<<<<< HEAD
 				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency_bcv($total * $currency_rate); ?></td>
+=======
+				<td style='text-align:right;border-top:2px solid #000000;'><?php echo to_currency_bcv($total2); ?></td>
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 			</tr>
 			<?php
 			foreach($taxes as $tax_group_index=>$tax)
@@ -189,7 +213,11 @@
 		<?php $border = (!$this->config->item('receipt_show_taxes') && !($this->config->item('receipt_show_total_discount') && $discount > 0)); ?>
 		<tr>
 			<td colspan="3" style="text-align:right;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo $this->lang->line('sales_total'); ?></td>
+<<<<<<< HEAD
 			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total * $currency_rate); ?></td>
+=======
+			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total2); ?></td>
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 		</tr>
 
 		<tr>
@@ -236,7 +264,11 @@
 					<?php
 						 //pago total
 						 //echo to_currency_bcv( $payments_total2 * -1 );
+<<<<<<< HEAD
 						 echo to_currency_bcv( $payment['payment_amount'] * $currency_rate * -1 );
+=======
+						 echo to_currency_bcv( $payment['payment_amount'] * -1  * $currency_rate);
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 					?>
 					
 				</td>
@@ -255,7 +287,7 @@
 		?>
 			<tr>
 				<td colspan="3" style="text-align:right;"><?php echo $this->lang->line('sales_giftcard_balance'); ?></td>
-				<td class="total-value"><?php echo to_currency($cur_giftcard_value); ?></td>
+				<td class="total-value"><?php echo to_currency_bcv($cur_giftcard_value  * $currency_rate); ?></td>
 			</tr>
 		<?php
 		}
@@ -265,7 +297,11 @@
 			<td class="total-value">
 				<?php
 					 //echo to_currency_bcv($amount_change * $currency_rate);
+<<<<<<< HEAD
 					 echo to_currency_bcv($amount_change * $currency_rate);
+=======
+					 echo to_currency_bcv($amount_change_ves);
+>>>>>>> parent of 9453f02 (Merge pull request #31 from josem109/jp-09122024)
 				?>
 			</td>
 		</tr>
