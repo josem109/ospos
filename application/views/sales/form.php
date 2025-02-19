@@ -81,7 +81,7 @@
 						<?php if(!currency_side()): ?>
 							<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
 						<?php endif; ?>
-						<?php echo form_input(array('name'=>'payment_amount_'.$i, 'value'=>$row->payment_amount, 'id'=>'payment_amount_'.$i, 'class'=>'form-control input-sm', 'readonly'=>'true'));?>
+						<?php echo form_input(array('name'=>'payment_amount_'.$i, 'value'=>round($row->payment_amount, 2), 'id'=>'payment_amount_'.$i, 'class'=>'form-control input-sm', 'readonly'=>'true'));?>
 						<?php if(currency_side()): ?>
 							<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
 						<?php endif; ?>

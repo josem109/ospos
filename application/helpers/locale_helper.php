@@ -255,6 +255,8 @@ function get_payment_options()
 	if($config->item('payment_options_order') == 'debitcreditcash')
 	{
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
+		$payments[$lang->line('sales_debit2')] = $lang->line('sales_debit2');
+		$payments[$lang->line('sales_debit3')] = $lang->line('sales_debit3');
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
@@ -264,6 +266,8 @@ function get_payment_options()
 	elseif($config->item('payment_options_order') == 'debitcashcredit')
 	{
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
+		$payments[$lang->line('sales_debit2')] = $lang->line('sales_debit2');
+		$payments[$lang->line('sales_debit3')] = $lang->line('sales_debit3');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
@@ -274,6 +278,8 @@ function get_payment_options()
 	{
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
+		$payments[$lang->line('sales_debit2')] = $lang->line('sales_debit2');
+		$payments[$lang->line('sales_debit3')] = $lang->line('sales_debit3');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
 		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
@@ -284,6 +290,8 @@ function get_payment_options()
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
+		$payments[$lang->line('sales_debit2')] = $lang->line('sales_debit2');
+		$payments[$lang->line('sales_debit3')] = $lang->line('sales_debit3');
 		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
 		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');
 		$payments[$lang->line('sales_pago_movil')] = $lang->line('sales_pago_movil');
@@ -292,6 +300,8 @@ function get_payment_options()
 	{
 		$payments[$lang->line('sales_cash')] = $lang->line('sales_cash');
 		$payments[$lang->line('sales_debit')] = $lang->line('sales_debit');
+		$payments[$lang->line('sales_debit2')] = $lang->line('sales_debit2');
+		$payments[$lang->line('sales_debit3')] = $lang->line('sales_debit3');
 		$payments[$lang->line('sales_credit')] = $lang->line('sales_credit');
 		$payments[$lang->line('sales_cash_bs')] = $lang->line('sales_cash_bs');
 		$payments[$lang->line('sales_zelle')] = $lang->line('sales_zelle');

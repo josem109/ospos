@@ -102,7 +102,7 @@ class Sale extends CI_Model
 				SELECT payments.sale_id,
 					SUM(CASE WHEN payments.cash_adjustment = 0 THEN payments.payment_amount ELSE 0 END) AS sale_payment_amount,
 					SUM(CASE WHEN payments.cash_adjustment = 1 THEN payments.payment_amount ELSE 0 END) AS sale_cash_adjustment,
-					GROUP_CONCAT(CONCAT(payments.payment_type, " ", (payments.payment_amount - payments.cash_refund)) SEPARATOR ", ") AS payment_type
+					GROUP_CONCAT(CONCAT(payments.payment_type, " ", ROUND(payments.payment_amount - payments.cash_refund, 2)) SEPARATOR ", ") AS payment_type
 				FROM ' . $this->db->dbprefix('sales_payments') . ' AS payments
 				INNER JOIN ' . $this->db->dbprefix('sales') . ' AS sales
 					ON sales.sale_id = payments.sale_id
@@ -170,8 +170,8 @@ class Sale extends CI_Model
 					$sale_cost AS cost,
 					($sale_total - $sale_cost) AS profit,
 					$sale_total AS amount_due,
-					MAX(payments.sale_payment_amount) AS amount_tendered,
-					(MAX(payments.sale_payment_amount)) - ($sale_total) AS change_due,
+					ROUND(MAX(payments.sale_payment_amount), 2) AS amount_tendered,
+					ROUND((MAX(payments.sale_payment_amount)), 2) - ($sale_total) AS change_due,
 					" . '
 					MAX(payments.payment_type) AS payment_type
 			');
@@ -297,7 +297,8 @@ class Sale extends CI_Model
 	public function get_payments_summary($search, $filters)
 	{
 		// get payment summary
-		$this->db->select('payment_type, COUNT(payment_amount) AS count, SUM(payment_amount - cash_refund) AS payment_amount');
+		//$this->db->select('payment_type, COUNT(payment_amount) AS count, SUM(payment_amount - cash_refund) AS payment_amount');
+		$this->db->select('payment_type, COUNT(payment_amount) AS count, ROUND(SUM(payment_amount - cash_refund), 2) AS payment_amount');
 		$this->db->from('sales AS sales');
 		$this->db->join('sales_payments', 'sales_payments.sale_id = sales.sale_id');
 		$this->db->join('people AS customer_p', 'sales.customer_id = customer_p.person_id', 'LEFT');

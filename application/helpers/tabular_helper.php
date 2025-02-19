@@ -95,7 +95,7 @@ function get_sale_data_row($sale)
 		'sale_time' => to_datetime(strtotime($sale->sale_time)),
 		'customer_name' => $sale->customer_name,
 		'amount_due' => to_currency($sale->amount_due),
-		'amount_tendered' => to_currency($sale->amount_tendered),
+		'amount_tendered' => to_currency(round($sale->amount_tendered,2)),
 		'change_due' => to_currency($sale->change_due),
 		'payment_type' => $sale->payment_type
 	);
@@ -137,8 +137,8 @@ function get_sale_data_last_row($sales)
 	foreach($sales->result() as $key=>$sale)
 	{
 		$sum_amount_due += $sale->amount_due;
-		$sum_amount_tendered += $sale->amount_tendered;
-		$sum_change_due += $sale->change_due;
+		$sum_amount_tendered += round($sale->amount_tendered,2);
+		$sum_change_due += round($sale->change_due,2);
 	}
 
 	return array(
@@ -162,7 +162,7 @@ function get_sales_manage_payments_summary($payments)
 
 	foreach($payments as $key=>$payment)
 	{
-		$amount = $payment['payment_amount'];
+		$amount = round($payment['payment_amount'],2);
 		$total = bcadd($total, $amount);
 		$table .= '<div class="summary_row">' . $payment['payment_type'] . ': ' . to_currency($amount) . '</div>';
 	}

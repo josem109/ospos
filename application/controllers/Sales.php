@@ -353,6 +353,7 @@ class Sales extends Secure_Controller
 			}
 			elseif($payment_type === $this->lang->line('sales_cash') || $payment_type === $this->lang->line('sales_zelle')
 			|| $payment_type === $this->lang->line('sales_debit') || $payment_type === $this->lang->line('sales_credit')
+			|| $payment_type === $this->lang->line('sales_debit2') || $payment_type === $this->lang->line('sales_debit3')
 			|| $payment_type === $this->lang->line('sales_cash_bs') || $payment_type === $this->lang->line('sales_pago_movil')
 			|| $payment_type === $this->lang->line('sales_check')) 
 			{
@@ -656,6 +657,7 @@ class Sales extends Secure_Controller
 
 			if (array_key_exists($this->lang->line('sales_cash'), $data['payments']) || array_key_exists($this->lang->line('sales_zelle'), $data['payments'])
 			|| array_key_exists($this->lang->line('sales_credit'), $data['payments']) || array_key_exists($this->lang->line('sales_debit'), $data['payments'])
+			|| array_key_exists($this->lang->line('sales_debit2'), $data['payments']) || array_key_exists($this->lang->line('sales_debit3'), $data['payments'])
 			|| array_key_exists($this->lang->line('sales_pago_movil'), $data['payments']))
 
 			{
@@ -667,6 +669,10 @@ class Sales extends Secure_Controller
 					$data['payments'][$this->lang->line('sales_credit')]['cash_refund'] = $data['amount_change'];
 				} elseif (array_key_exists($this->lang->line('sales_debit'), $data['payments'])) {
 					$data['payments'][$this->lang->line('sales_debit')]['cash_refund'] = $data['amount_change'];
+				} elseif (array_key_exists($this->lang->line('sales_debit2'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_debit2')]['cash_refund'] = $data['amount_change'];
+				} elseif (array_key_exists($this->lang->line('sales_debit3'), $data['payments'])) {
+					$data['payments'][$this->lang->line('sales_debit3')]['cash_refund'] = $data['amount_change'];
 				} elseif (array_key_exists($this->lang->line('sales_pago_movil'), $data['payments'])) {
 					$data['payments'][$this->lang->line('sales_pago_movil')]['cash_refund'] = $data['amount_change'];
 				} else {
