@@ -300,7 +300,7 @@ if(isset($success))
 								<?php
 								if($items_module_allowed && $change_price)
 								{
-									$precio_multiplicado = round(($item['price'] * $currency_rate_alternative) / $currency_rate,2);
+									$precio_multiplicado = ($item['price'] * $currency_rate_alternative) / $currency_rate;
 									
 									echo form_input(array('name'=>'price_converted', 'class'=>'form-control input-sm', 'style'=>'font-size: 10px', 'value'=>to_currency_no_money($precio_multiplicado), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();','disabled'=>'disabled'));
 
@@ -348,10 +348,9 @@ if(isset($success))
 								{
 									if($item["discount"] == 0)
 									{
-										//$total_line_bs = (round($item['discounted_total'],2) * $currency_rate);
-										$total_line_bs = round($item['price'] * $item['quantity'] * $currency_rate_alternative,2);
+										$total_line_bs = $item['price'] * $item['quantity'] * $currency_rate_alternative;
 									} else {
-										$total_line_bs = (round($item['discounted_total'],2) * $currency_rate);
+										$total_line_bs = ($item['discounted_total'] * $currency_rate);
 									}
 									
 									/*echo to_currency($item['discounted_total']);*/

@@ -81,6 +81,7 @@
 					<td class="total-value">
 					<?php
 						 $calculated_total = $item['price'] * $item['quantity'] * $currency_rate;
+						 $prediscount_subtotal_calculated = $prediscount_subtotal_calculated + $calculated_total;
 						 if ($item["discount"] == 0) 
 						 {
 							$display_value = $calculated_total;
@@ -150,7 +151,12 @@
 		?>
 			<tr>
 				<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_sub_total'); ?></td>
-				<td style='text-align:left;border-top:2px solid #000000;'><?php echo to_currency_bcv($prediscount_subtotal * $currency_rate); ?></td>
+				<td style='text-align:left;border-top:2px solid #000000;'>
+					<?php
+				 		//echo to_currency_bcv($prediscount_subtotal * $currency_rate);
+						 echo to_currency_bcv($prediscount_subtotal_calculated);
+				 	?>
+				</td>
 			</tr>
 			<tr>
 				<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_customer_discount'); ?>:</td>
@@ -189,7 +195,14 @@
 		<?php $border = (!$this->config->item('receipt_show_taxes') && !($this->config->item('receipt_show_total_discount') && $discount > 0)); ?>
 		<tr>
 			<td colspan="3" style="text-align:right;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo $this->lang->line('sales_total'); ?></td>
-			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total * $currency_rate); ?></td>
+			<!--<td style="text-align:left;
+				<?php 
+					//echo $border? 'border-top: 2px solid black;' :''; 
+				?>">
+				<?php 
+					//echo to_currency_bcv($total * $currency_rate); 
+				?></td>-->
+			<td style="text-align:left;<?php echo $border? 'border-top: 2px solid black;' :''; ?>"><?php echo to_currency_bcv($total2); ?></td>
 		</tr>
 
 		<tr>
