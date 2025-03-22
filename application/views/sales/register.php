@@ -150,7 +150,7 @@ if(isset($success))
 				</li>
 				</li>
 				</p>
-				<li class="pull-left" style="margin-left: 1px;">
+				<li class="pull-left" style="margin-left: 1px; display: none;">
 					<label for="sales_currency_bcv" class='control-label'><?php echo $this->lang->line('sales_currency_bcv'); ?></label>
 					<input type="text" name="sales_currency_bcv" id="sales_currency_bcv" class="form-control input-sm" size="10" style="display:inline-block;width:auto;margin-left: 10px;" />
 					<label for="sales_currency_alternative" class='control-label'><?php echo $this->lang->line('sales_currency_alternative'); ?></label>
@@ -172,12 +172,15 @@ if(isset($success))
 		</div>
 		<!-- Pinto 08/28/2023 -->		
 		<p>Tasa de cambio BCV: <span id="tasa_cambio">-->
-				<?php echo($this->config->item('currency_rate')); 
-					$currency_rate = floatval($this->config->item('currency_rate'));
-				?>
-				</span>
+			<?php echo($this->config->item('currency_rate')); 
+				$currency_rate = floatval($this->config->item('currency_rate'));
+			?>
+    		</span>
+			<span id="info_icon" style="cursor: pointer; color: red; margin-left: 5px;" title="Tasa de cambio Paralela: <?php echo($this->config->item('currency_rate_alternative')); ?>">
+				&#x26A0;
+			</span>
 		</p>
-		<p>Tasa de cambio Paralela: <span id="tasa_cambio">-->
+		<p style="display: none;">Tasa de cambio Paralela: <span id="tasa_cambio">-->
 				<?php echo($this->config->item('currency_rate_alternative')); 
 					$currency_rate_alternative = floatval($this->config->item('currency_rate_alternative'));
 				?>
