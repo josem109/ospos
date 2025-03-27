@@ -106,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['functionname']) && $_
     if ($data2 && isset($data2['price'])) {
         try {
             // Actualizar en `ospos_app_config` el valor de `currency_rate_alternative`
-            $query = $db->prepare("UPDATE `ospos_app_config` SET `value` = :dolarValue WHERE `key` = 'currency_rate_alternative'");
+            /*$query = $db->prepare("UPDATE `ospos_app_config` SET `value` = :dolarValue WHERE `key` = 'currency_rate_alternative'");
             $query->bindParam(':dolarValue', $data2['price']);
-            $query->execute();
+            $query->execute();*/
         } catch (PDOException $e) {
             echo json_encode(['error' => 'Error al actualizar el valor alternativo: ' . $e->getMessage()]);
             return;
