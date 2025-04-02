@@ -310,7 +310,6 @@ class Sale extends CI_Model
 		}
 		else
 		{
-			$this->db->where('sales.sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date'])));
 		}
 
 		if(!empty($search))
@@ -1453,8 +1452,6 @@ class Sale extends CI_Model
 	public function get_suspended_sale_info($sale_id)
 	{
 		$this->db->from('sales');
-		$this->db->where('sale_id', $sale_id);
-		$this->db->join('people', 'people.person_id = sales.customer_id', 'LEFT');
 		$this->db-where('sale_status', SUSPENDED);
 
 		return $this->db->get();
@@ -1485,6 +1482,110 @@ class Sale extends CI_Model
 				$this->Rewards->save($rewards_data);
 			}
 		}
+	}
+
+	/**
+	 * Updates the adeudado payment amount when a new payment is added
+	 * @param int $sale_id the sale ID
+	 * @param float $payment_amount the amount to subtract from adeudado
+	 * @return boolean TRUE if successful, FALSE otherwise
+	 */
+	public function update_adeudado_payment($sale_id, $payment_amount)
+	{
+		$this->db->trans_start();
+
+		// Primero obtenemos el registro de pago "Adeudado" para esta venta
+		$this->db->where('sale_id', $sale_id);
+		$this->db->where('payment_type', 'Adeudado');
+		$query = $this->db->get('sales_payments');
+
+		if ($query->num_rows() > 0) {
+			$payment = $query->row();
+			$new_amount = $payment->payment_amount - $payment_amount;
+
+			// Actualizamos el monto adeudado
+			$this->db->where('sale_id', $sale_id);
+			$this->db->where('payment_type', 'Adeudado');
+			$this->db->update('sales_payments', array(
+				'payment_amount' => $new_amount
+			));
+		}
+
+		$this->db->trans_complete();
+
+		return $this->db->trans_status();
+	}
+
+	/**
+	 * Inserta o actualiza un pago en la tabla sales_payments
+	 * @param int $sale_id ID de la venta
+	 * @param float $payment_amount monto del pago
+	 * @param string $payment_type tipo de pago
+	 * @return boolean TRUE si fue exitoso, FALSE en caso contrario
+	 */
+	public function save_payment($sale_id, $payment_amount, $payment_type)
+	{
+		try {
+			// Buscar si existe un registro con el sale_id y payment_type
+			$this->db->where('sale_id', $sale_id);
+			$this->db->where('payment_type', $payment_type);
+			$query = $this->db->get('sales_payments');
+
+			if ($query->num_rows() > 0) {
+				// Si existe, actualizamos sumando el nuevo monto
+				$payment = $query->row();
+				$new_amount = $payment->payment_amount + $payment_amount;
+
+				$this->db->where('sale_id', $sale_id);
+				$this->db->where('payment_type', $payment_type);
+				return $this->db->update('sales_payments', array(
+					'payment_amount' => $new_amount
+				));
+			} else {
+				// Si no existe, insertamos un nuevo registro
+				return $this->db->insert('sales_payments', array(
+					'sale_id' => $sale_id,
+					'payment_type' => $payment_type,
+					'payment_amount' => $payment_amount,
+					'payment_time' => date('Y-m-d H:i:s'),
+					'employee_id' => $this->session->userdata('person_id')
+				));
+			}
+		} catch (Exception $e) {
+			log_message('error', 'Error en Sale->save_payment(): ' . $e->getMessage());
+			return FALSE;
+		}
+	}
+
+	public function get_adeudado_payment($sale_id)
+	{
+		$this->db->select('payment_amount');
+		$this->db->from('sales_payments');
+		$this->db->where('sale_id', $sale_id);
+		$this->db->where('payment_type', 'Adeudado');
+		
+		$query = $this->db->get();
+		
+		if ($query->num_rows() > 0) {
+			return floatval($query->row()->payment_amount);
+		}
+		
+		return 0;
+	}
+
+	/**
+	 * Elimina el registro de pago "Adeudado" de una venta
+	 * @param int $sale_id ID de la venta
+	 * @return boolean TRUE si fue exitoso, FALSE en caso contrario
+	 */
+	public function delete_adeudado_payment($sale_id)
+	{
+		// Elimina el registro "Adeudado" de la tabla sales_payments
+		$this->db->where('sale_id', $sale_id);
+		$this->db->where('payment_type', 'Adeudado');
+		$this->db->delete('sales_payments');
+		
+		return $this->db->affected_rows() > 0;
 	}
 
 }

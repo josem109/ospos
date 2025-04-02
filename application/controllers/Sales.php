@@ -13,6 +13,7 @@ class Sales extends Secure_Controller
 		$this->load->library('email_lib');
 		$this->load->library('token_lib');
 		$this->load->library('barcode_lib');
+		$this->load->model('Payment'); // Agregamos esta línea
 	}
 
 	public function index()
@@ -1272,6 +1273,7 @@ class Sales extends Secure_Controller
 		$data['selected_employee_id'] = $sale_info['employee_id'];
 		$data['selected_employee_name'] = $this->xss_clean($employee_info->first_name . ' ' . $employee_info->last_name);
 		$data['sale_info'] = $sale_info;
+		
 		$balance_due = round($sale_info['amount_due'] - $sale_info['amount_tendered'] + $sale_info['cash_refund'], totals_decimals(), PHP_ROUND_HALF_UP);
 		if(!$this->sale_lib->reset_cash_rounding() && $balance_due < 0)
 		{
@@ -1287,6 +1289,24 @@ class Sales extends Secure_Controller
 			}
 			$data['payments'][] = $payment;
 		}
+
+		// Solo agregamos esta línea
+		$data['payment_history'] = $this->get_sale_payment_details($sale_id);
+
+		// Verificar si hay pagos en la tabla ospos_payments
+		$has_payments = $this->Payment->has_payments($sale_id);
+		
+		// Verificar si hay pago adeudado
+		$has_adeudado = false;
+		foreach($data['payments'] as $payment) {
+			if($payment->payment_type === "Adeudado") {
+				$has_adeudado = true;
+				break;
+			}
+		}
+		
+		// La sección se mostrará si hay adeudado O si hay pagos registrados
+		$data['show_payment_section'] = $has_adeudado || $has_payments;
 
 		$data['payment_type_new'] = PAYMENT_TYPE_UNASSIGNED;
 		$data['payment_amount_new'] = $balance_due;
@@ -1662,6 +1682,118 @@ class Sales extends Secure_Controller
 		}
 
 		return NULL;
+	}
+
+	/**
+	 * Obtiene los pagos asociados a una venta específica
+	 * @param int $sale_id ID de la venta
+	 * @return array Array con los pagos formateados
+	 */
+	private function get_sale_payment_details($sale_id)
+	{
+		try {
+			$payment_records = array();
+			$payment_query = $this->Payment->get_sale_payments($sale_id);
+			
+			if ($payment_query && $payment_query->num_rows() > 0) {
+				foreach($payment_query->result_array() as $payment_row) {
+					$payment_records[] = $this->xss_clean(array(
+						'payment_id' => $payment_row['payment_id'],
+						'payment_date' => $payment_row['payment_date'],
+						'payment_amount' => $payment_row['payment_amount'],
+						'payment_type' => $payment_row['payment_type'],
+						'employee_name' => $payment_row['employee_name']
+					));
+				}
+			}
+			
+			return $payment_records;
+		} catch (Exception $e) {
+			log_message('error', 'Error en get_sale_payment_details: ' . $e->getMessage());
+			return array();
+		}
+	}
+
+	/**
+	 * Agrega un nuevo pago a una venta existente
+	 */
+	public function add_payment_to_sale()
+	{
+		$data = array();
+		$sale_id = $this->input->post('sale_id');
+		$payment_amount = $this->input->post('payment_amount');
+		$payment_type = $this->input->post('payment_type');
+
+		// Validaciones básicas
+		if (empty($sale_id) || !is_numeric($sale_id)) {
+			$data['success'] = FALSE;
+			$data['message'] = $this->lang->line('sales_error_invalid_sale_id');
+			echo json_encode($data);
+			return;
+		}
+
+		// Obtener el monto adeudado actual
+		$adeudado_payment = $this->Sale->get_adeudado_payment($sale_id);
+		
+		// Validar que el pago no exceda el monto adeudado
+		if ($payment_amount > $adeudado_payment) {
+			$data['success'] = FALSE;
+			$data['message'] = 'El monto del pago no puede ser mayor que el monto adeudado';
+			echo json_encode($data);
+			return;
+		}
+
+		// Preparar los datos del pago
+		$payment_data = array(
+			'sale_id' => $sale_id,
+			'payment_type' => $payment_type,
+			'payment_amount' => $payment_amount,
+			'payment_date' => date('Y-m-d H:i:s'),
+			'employee_id' => $this->Employee->get_logged_in_employee_info()->person_id
+		);
+
+		// Iniciar transacción para actualizar ambas tablas
+		$this->db->trans_start();
+
+		// 1. Guardar en ospos_payments
+		$payment_saved = $this->Payment->save($payment_data);
+
+		// 2. Actualizar o insertar en ospos_sales_payments
+		$sales_payment_saved = $this->Sale->save_payment($sale_id, $payment_amount, $payment_type);
+
+		// 3. Verificar si el pago cubre completamente el monto adeudado
+		$remaining_amount = $adeudado_payment - $payment_amount;
+		
+		if($remaining_amount <= 0) {
+			// Si el adeudado llega a cero o menos, eliminar el registro de adeudado
+			$adeudado_updated = $this->Sale->delete_adeudado_payment($sale_id);
+		} else {
+			// Si aún queda saldo pendiente, actualizar el monto adeudado
+			$adeudado_updated = $this->Sale->update_adeudado_payment($sale_id, $payment_amount);
+		}
+
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() && $payment_saved && $sales_payment_saved) {
+			// Obtener los detalles actualizados de los pagos
+			$payment_details = $this->get_sale_payment_details($sale_id);
+			$latest_payment = end($payment_details);
+			
+			$data['success'] = TRUE;
+			$data['message'] = $this->lang->line('sales_payment_added_successfully');
+			$data['payment'] = array(
+				'payment_id' => $latest_payment['payment_id'],
+				'payment_date' => to_datetime(strtotime($latest_payment['payment_date'])),
+				'payment_amount' => to_currency($latest_payment['payment_amount']),
+				'payment_type' => $latest_payment['payment_type'],
+				'employee_name' => $latest_payment['employee_name']
+			);
+		} else {
+			$data['success'] = FALSE;
+			$data['message'] = $this->lang->line('sales_error_adding_payment');
+		}
+
+		echo json_encode($data);
 	}
 }
 ?>
