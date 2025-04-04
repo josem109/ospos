@@ -191,6 +191,9 @@
 						<th>Monto</th>
 						<th>Tipo de Pago</th>
 						<th>Reportado por</th>
+						<?php if($this->session->userdata('role') == 'admin'): ?>
+						<th><span class="glyphicon glyphicon-cog"></span></th>
+						<?php endif; ?>
 					</tr>
 				</thead>
 				<tbody>
@@ -202,11 +205,18 @@
 								<td><?php echo to_currency($payment['payment_amount']); ?></td>
 								<td><?php echo $payment['payment_type']; ?></td>
 								<td><?php echo $payment['employee_name']; ?></td>
+								<?php if($this->session->userdata('role') == 'admin'): ?>
+								<td>
+									<a href="javascript:void(0);" class="delete-payment" data-payment-id="<?php echo $payment['payment_id']; ?>">
+										<span class="glyphicon glyphicon-trash" style="color: #e74c3c;"></span>
+									</a>
+								</td>
+								<?php endif; ?>
 							</tr>
 						<?php endforeach; ?>
 					<?php endif; ?>
 					<tr id="no_payments_row" class="<?php echo (isset($payment_history) && !empty($payment_history)) ? 'hidden' : ''; ?>">
-						<td colspan="5" style="text-align: center;">No hay pagos registrados</td>
+						<td colspan="<?php echo ($this->session->userdata('role') == 'admin') ? '6' : '5'; ?>" style="text-align: center;">No hay pagos registrados</td>
 					</tr>
 				</tbody>
 			</table>
@@ -369,8 +379,8 @@ $(document).ready(function()
 		var adeudadoAmount = parseFloat($('input[name="payment_amount"]').val());
 		var paymentAmount = parseFloat(pAmount);
 
-		if (paymentAmount > adeudadoAmount) {
-			showNotification('El monto del pago no puede ser mayor que el monto adeudado (' + adeudadoAmount.toFixed(2) + ')');
+		if (paymentAmount > adeudadoAmount.toFixed(2)) {
+			showNotification('1El monto del pago no puede ser mayor que el monto adeudado (' + adeudadoAmount.toFixed(2) + ')');
 			return;
 		}
 
@@ -464,6 +474,49 @@ $(document).ready(function()
 				'</div>'
 		});
 	}
+
+	// Manejador para eliminar pagos
+	$('#payment_abonos_table').on('click', '.delete-payment', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var paymentId = $(this).data('payment-id');
+		var row = $(this).closest('tr');
+		
+		// Mostrar diálogo de confirmación
+		if(confirm('¿Está seguro que desea eliminar este pago?')) {
+			$.ajax({
+				url: '<?php echo site_url("sales/delete_payment_history"); ?>/' + paymentId,
+				type: 'POST',
+				dataType: 'json',
+				success: function(response) {
+					if(response.success) {
+						// Eliminar la fila de la tabla
+						row.remove();
+						
+						// Verificar si quedan filas en la tabla
+						if($('#payment_abonos_table tbody tr').length <= 1) { // Solo queda la fila de "No hay pagos"
+							$('#no_payments_row').removeClass('hidden');
+						}
+						
+						// Mostrar mensaje de éxito
+						showNotification(response.message, 'success');
+						
+						// Recargar la página para actualizar los montos
+						setTimeout(function() {
+							window.location.reload();
+						}, 1500);
+					} else {
+						// Mostrar mensaje de error
+						showNotification(response.message);
+					}
+				},
+				error: function() {
+					showNotification('Error al procesar la solicitud');
+				}
+			});
+		}
+	});
 
 	function formatDate(dateString) {
 		var date = new Date(dateString);

@@ -1588,5 +1588,94 @@ class Sale extends CI_Model
 		return $this->db->affected_rows() > 0;
 	}
 
+	/**
+	 * Obtiene los detalles de un pago específico en la tabla sales_payments
+	 * @param int $sale_id ID de la venta
+	 * @param string $payment_type Tipo de pago
+	 * @return object|null Objeto con los detalles del pago o null si no existe
+	 */
+	public function get_sales_payment_details($sale_id, $payment_type)
+	{
+		$this->db->from('sales_payments');
+		$this->db->where('sale_id', $sale_id);
+		$this->db->where('payment_type', $payment_type);
+		$query = $this->db->get();
+		
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Actualiza el monto de un pago en la tabla sales_payments
+	 * @param int $sale_id ID de la venta
+	 * @param string $payment_type Tipo de pago
+	 * @param float $amount Monto a restar del pago actual
+	 * @return boolean TRUE si se actualizó correctamente, FALSE en caso contrario
+	 */
+	public function update_sales_payment_amount($sale_id, $payment_type, $amount)
+	{
+		$this->db->trans_start();
+		
+		// Obtener el pago actual
+		$payment = $this->get_sales_payment_details($sale_id, $payment_type);
+		
+		if ($payment) {
+			$new_amount = $payment->payment_amount - $amount;
+			
+			if ($new_amount <= 0) {
+				// Si el monto llega a cero o menos, eliminar el registro
+				$this->db->where('sale_id', $sale_id);
+				$this->db->where('payment_type', $payment_type);
+				$this->db->delete('sales_payments');
+			} else {
+				// Actualizar el monto
+				$this->db->where('sale_id', $sale_id);
+				$this->db->where('payment_type', $payment_type);
+				$this->db->update('sales_payments', array('payment_amount' => $new_amount));
+			}
+		}
+		
+		$this->db->trans_complete();
+		return $this->db->trans_status();
+	}
+
+	/**
+	 * Maneja la lógica del pago adeudado al eliminar un pago
+	 * @param int $sale_id ID de la venta
+	 * @param float $amount Monto a agregar al adeudado
+	 * @return boolean TRUE si se procesó correctamente, FALSE en caso contrario
+	 */
+	public function handle_adeudado_payment($sale_id, $amount)
+	{
+		$this->db->trans_start();
+		
+		// Verificar si existe un pago adeudado
+		$adeudado = $this->get_sales_payment_details($sale_id, 'Adeudado');
+		
+		if ($adeudado) {
+			// Si existe, actualizar el monto
+			$new_amount = $adeudado->payment_amount + $amount;
+			$this->db->where('sale_id', $sale_id);
+			$this->db->where('payment_type', 'Adeudado');
+			$this->db->update('sales_payments', array('payment_amount' => $new_amount));
+		} else {
+			// Si no existe, crear un nuevo registro
+			$data = array(
+				'sale_id' => $sale_id,
+				'payment_type' => 'Adeudado',
+				'payment_amount' => $amount,
+				'payment_time' => date('Y-m-d H:i:s'),
+				'employee_id' => $this->session->userdata('person_id')
+			);
+			$this->db->insert('sales_payments', $data);
+		}
+		
+		$this->db->trans_complete();
+		return $this->db->trans_status();
+	}
+
 }
 ?>

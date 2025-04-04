@@ -391,8 +391,72 @@ class Sales extends Secure_Controller
 	public function delete_payment($payment_id)
 	{
 		$this->sale_lib->delete_payment($payment_id);
-
 		$this->_reload();
+	}
+
+	/**
+	 * Elimina un pago del historial de pagos
+	 * 
+	 * @param int $payment_id ID del pago a eliminar
+	 * @return void
+	 */
+	public function delete_payment_history($payment_id)
+	{
+		// Verificar que el usuario sea admin
+		if($this->session->userdata('role') != 'admin')
+		{
+			echo json_encode(array('success' => FALSE, 'message' => 'No tiene permisos para realizar esta acción'));
+			return;
+		}
+
+		// Obtener detalles del pago
+		$payment_details = $this->Payment->get_payment_details($payment_id);
+		if($payment_details === NULL)
+		{
+			echo json_encode(array('success' => FALSE, 'message' => 'Pago no encontrado'));
+			return;
+		}
+
+		// Iniciar transacción
+		$this->db->trans_start();
+
+		// Eliminar el pago de ospos_payments
+		$payment_deleted = $this->Payment->delete_payment($payment_id);
+		if(!$payment_deleted)
+		{
+			$this->db->trans_rollback();
+			echo json_encode(array('success' => FALSE, 'message' => 'Error al eliminar el pago'));
+			return;
+		}
+
+		// Actualizar el monto en sales_payments
+		$payment_updated = $this->Sale->update_sales_payment_amount($payment_details->sale_id, $payment_details->payment_type, $payment_details->payment_amount);
+		if(!$payment_updated)
+		{
+			$this->db->trans_rollback();
+			echo json_encode(array('success' => FALSE, 'message' => 'Error al actualizar el monto del pago'));
+			return;
+		}
+
+		// Manejar el pago adeudado
+		$adeudado_handled = $this->Sale->handle_adeudado_payment($payment_details->sale_id, $payment_details->payment_amount);
+		if(!$adeudado_handled)
+		{
+			$this->db->trans_rollback();
+			echo json_encode(array('success' => FALSE, 'message' => 'Error al manejar el pago adeudado'));
+			return;
+		}
+
+		// Finalizar transacción
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE)
+		{
+			echo json_encode(array('success' => FALSE, 'message' => 'Error en la transacción'));
+			return;
+		}
+
+		echo json_encode(array('success' => TRUE, 'message' => 'Pago eliminado correctamente'));
 	}
 
 	public function add()
@@ -1736,7 +1800,7 @@ class Sales extends Secure_Controller
 		$adeudado_payment = $this->Sale->get_adeudado_payment($sale_id);
 		
 		// Validar que el pago no exceda el monto adeudado
-		if ($payment_amount > $adeudado_payment) {
+		if ($payment_amount > round($adeudado_payment, 2)) {
 			$data['success'] = FALSE;
 			$data['message'] = 'El monto del pago no puede ser mayor que el monto adeudado';
 			echo json_encode($data);

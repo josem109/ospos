@@ -127,4 +127,50 @@ class Payment extends CI_Model
         $query = $this->db->get('ospos_payments');
         return $query->num_rows() > 0;
     }
+
+    /**
+     * Obtiene los detalles de un pago específico
+     * @param int $payment_id ID del pago
+     * @return object|null Objeto con los detalles del pago o null si no existe
+     */
+    public function get_payment_details($payment_id)
+    {
+        $this->db->from('ospos_payments');
+        $this->db->where('payment_id', $payment_id);
+        $query = $this->db->get();
+        
+        if ($query->num_rows() > 0) {
+            return $query->row();
+        }
+        
+        return null;
+    }
+
+    /**
+     * Elimina un pago específico de la tabla ospos_payments
+     * @param int $payment_id ID del pago a eliminar
+     * @return boolean TRUE si se eliminó correctamente, FALSE en caso contrario
+     */
+    public function delete_payment($payment_id)
+    {
+        $this->db->where('payment_id', $payment_id);
+        return $this->db->delete('ospos_payments');
+    }
+
+    /**
+     * Obtiene el monto total de pagos de un tipo específico para una venta
+     * @param int $sale_id ID de la venta
+     * @param string $payment_type Tipo de pago
+     * @return float Monto total de los pagos del tipo especificado
+     */
+    public function get_payment_type_total($sale_id, $payment_type)
+    {
+        $this->db->select_sum('payment_amount');
+        $this->db->from('ospos_payments');
+        $this->db->where('sale_id', $sale_id);
+        $this->db->where('payment_type', $payment_type);
+        
+        $result = $this->db->get()->row();
+        return $result ? floatval($result->payment_amount) : 0;
+    }
 } 
