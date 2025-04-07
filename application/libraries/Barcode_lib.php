@@ -109,8 +109,8 @@ class Barcode_lib
 			if($barcode_config['barcode_generate_if_empty'])
 			{
 				// generate barcode with the correct instance
-				$seed = '1' . $barcode_instance->generate($seed);
-				//$seed = $barcode_instance->generate($seed);
+				//$seed = '1' . $barcode_instance->generate($seed);
+				$seed = $barcode_instance->generate($seed);
 				//$seed .= ''date($barcode_config['date_format'])'';
 			}
 			else
