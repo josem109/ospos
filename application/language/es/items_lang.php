@@ -1,4 +1,5 @@
 <?php
+$lang["common_export_all"] = "Exportar Todo el Inventario";
 $lang["items_add_minus"] = "Inventario a agregar/substraer.";
 $lang["items_allow_alt_description"] = "Permitir Descripción Alternativa";
 $lang["items_amount_entry"] = "Monto entrada";
