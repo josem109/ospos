@@ -95,6 +95,24 @@
 		html {
 			overflow: auto;
 		}
+		.text-success {
+			color: #28a745;
+		}
+		.text-danger {
+			color: #dc3545;
+		}
+		.ui-autocomplete {
+			max-height: 300px;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+		.ui-autocomplete .ui-menu-item {
+			padding: 5px;
+			border-bottom: 1px solid #eee;
+		}
+		.ui-autocomplete .ui-menu-item:last-child {
+			border-bottom: none;
+		}
 	</style>
 </head>
 
