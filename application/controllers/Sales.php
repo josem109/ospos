@@ -1833,7 +1833,7 @@ class Sales extends Secure_Controller
 			$adeudado_updated = $this->Sale->delete_adeudado_payment($sale_id);
 		} else {
 			// Si aún queda saldo pendiente, actualizar el monto adeudado
-			$adeudado_updated = $this->Sale->update_adeudado_payment($sale_id, $payment_amount);
+		$adeudado_updated = $this->Sale->update_adeudado_payment($sale_id, $payment_amount);
 		}
 
 		$this->db->trans_complete();

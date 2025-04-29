@@ -986,5 +986,64 @@ class Item extends CI_Model
 		}
 		return 'item_name';
 	}
+
+	/**
+	 * Obtiene todos los items para exportación, incluyendo información de impuestos y categorías
+	 * 
+	 * @param array $filters Filtros a aplicar
+	 * @return object Resultado de la consulta
+	 */
+	public function get_all_for_export($filters)
+	{
+		$this->db->select('items.*');
+		$this->db->select('MAX(suppliers.company_name) AS company_name');
+		$this->db->select('MAX(item_quantities.quantity) AS quantity');
+		
+		$this->db->from('items AS items');
+		$this->db->join('suppliers AS suppliers', 'suppliers.person_id = items.supplier_id', 'left');
+		$this->db->join('item_quantities AS item_quantities', 'item_quantities.item_id = items.item_id', 'left');
+		
+		if($filters['stock_location_id'] > -1)
+		{
+			$this->db->where('item_quantities.location_id', $filters['stock_location_id']);
+		}
+
+		// Aplicar filtros adicionales
+		if($filters['empty_upc'] != FALSE)
+		{
+			$this->db->where('item_number', NULL);
+		}
+		if($filters['low_inventory'] != FALSE)
+		{
+			$this->db->where('quantity <=', 'reorder_level');
+		}
+		if($filters['is_serialized'] != FALSE)
+		{
+			$this->db->where('is_serialized', 1);
+		}
+		if($filters['no_description'] != FALSE)
+		{
+			$this->db->where('items.description', '');
+		}
+		if($filters['temporary'] != FALSE)
+		{
+			$this->db->where('items.item_type', ITEM_TEMP);
+		}
+		else
+		{
+			$non_temp = array(ITEM, ITEM_KIT, ITEM_AMOUNT_ENTRY);
+			$this->db->where_in('items.item_type', $non_temp);
+		}
+
+		$this->db->where('items.deleted', $filters['is_deleted']);
+
+		// Agrupar por item_id para evitar duplicados
+		$this->db->group_by('items.item_id');
+
+		// Ordenar por nombre
+		$this->db->order_by('items.name', 'asc');
+
+		return $this->db->get();
+	}
 }
 ?>

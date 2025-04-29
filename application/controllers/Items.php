@@ -1226,5 +1226,105 @@ class Items extends Secure_Controller
 			}
 		}
 	}
+
+	public function export_all()
+	{
+		// Obtener los filtros actuales
+		$filters = array(
+			'stock_location_id' => $this->item_lib->get_item_location(),
+			'empty_upc' => FALSE,
+			'low_inventory' => FALSE,
+			'is_serialized' => FALSE,
+			'no_description' => FALSE,
+			'search_custom' => FALSE,
+			'is_deleted' => FALSE,
+			'temporary' => FALSE,
+			'definition_ids' => array_keys($this->Attribute->get_definitions_by_flags(Attribute::SHOW_IN_ITEMS))
+		);
+
+		// Aplicar filtros seleccionados
+		$filledup = array_fill_keys($this->input->post('filters'), TRUE);
+		$filters = array_merge($filters, $filledup);
+
+		// Obtener todos los items usando el nuevo método
+		$items = $this->Item->get_all_for_export($filters);
+
+		// Preparar los datos para el CSV
+		$data = array();
+		$data[] = array(
+			'ID',
+			'Nombre',
+			'Categoría',
+			'ID Proveedor',
+			'Nombre Proveedor',
+			'Código',
+			'Descripción',
+			'Precio Costo',
+			'Precio Venta',
+			'Cantidad',
+			'Nivel Reorden',
+			'Cantidad Recibida',
+			'Permitir Descripción Alt',
+			'Tiene Número Serie',
+			'Imagen',
+			'Tipo Item',
+			'Tipo Stock',
+			'Impuesto 1 Nombre',
+			'Impuesto 1 Porcentaje',
+			'Impuesto 2 Nombre',
+			'Impuesto 2 Porcentaje',
+			'Categoría Impuesto',
+			'HSN'
+		);
+
+		foreach($items->result() as $item)
+		{
+			$item_taxes = $this->Item_taxes->get_info($item->item_id);
+			$tax_category = '';
+			
+			if($item->tax_category_id !== NULL)
+			{
+				$tax_category_info = $this->Tax_category->get_info($item->tax_category_id);
+				$tax_category = $tax_category_info->tax_category;
+			}
+
+			// Asegurar que todos los valores sean strings y escapar comas
+			$data[] = array(
+				(string)$item->item_id,
+				'"' . str_replace('"', '""', $item->name) . '"',
+				'"' . str_replace('"', '""', $item->category) . '"',
+				(string)$item->supplier_id,
+				'"' . str_replace('"', '""', $item->company_name) . '"',
+				'"' . str_replace('"', '""', $item->item_number) . '"',
+				'"' . str_replace('"', '""', $item->description) . '"',
+				(string)$item->cost_price,
+				(string)$item->unit_price,
+				(string)$item->quantity,
+				(string)$item->reorder_level,
+				(string)$item->receiving_quantity,
+				$item->allow_alt_description ? '1' : '0',
+				$item->is_serialized ? '1' : '0',
+				'"' . str_replace('"', '""', $item->pic_filename) . '"',
+				(string)$item->item_type,
+				(string)$item->stock_type,
+				'"' . str_replace('"', '""', isset($item_taxes[0]) ? $item_taxes[0]->name : '') . '"',
+				(string)(isset($item_taxes[0]) ? $item_taxes[0]->percent : ''),
+				'"' . str_replace('"', '""', isset($item_taxes[1]) ? $item_taxes[1]->name : '') . '"',
+				(string)(isset($item_taxes[1]) ? $item_taxes[1]->percent : ''),
+				'"' . str_replace('"', '""', $tax_category) . '"',
+				'"' . str_replace('"', '""', $item->hsn_code) . '"'
+			);
+		}
+
+		// Convertir el array a CSV
+		$csv_data = '';
+		foreach($data as $row)
+		{
+			$csv_data .= implode(',', $row) . "\n";
+		}
+		
+		// Devolver los datos en formato CSV
+		echo $csv_data;
+	}
 }
 ?>
