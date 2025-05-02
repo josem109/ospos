@@ -17,7 +17,7 @@ $(document).ready(function()
         table_support.refresh();
     });
 
-	// load the preset daterange picker
+	// load the preset daterangepicker
 	<?php $this->load->view('partial/daterangepicker'); ?>
     // set the beginning of time as starting date
     $('#daterangepicker').data('daterangepicker').setStartDate("<?php echo date($this->config->item('dateformat'), mktime(0,0,0,01,01,2010));?>");
@@ -29,6 +29,38 @@ $(document).ready(function()
 
     $("#stock_location").change(function() {
        table_support.refresh();
+    });
+
+    // Manejar el click del botón de exportación
+    $('.btn-info[data-href*="export_all"]').click(function(e) {
+        e.preventDefault();
+        
+        // Obtener los parámetros actuales
+        var filters = $("#filters").val() || [""];
+        var stock_location = $("#stock_location").val();
+        
+        // Hacer la llamada AJAX para obtener todos los datos
+        $.ajax({
+            url: '<?php echo site_url("items/export_all"); ?>',
+            type: 'POST',
+            data: {
+                filters: filters,
+                stock_location: stock_location
+            },
+            success: function(response) {
+                // Crear un elemento temporal para descargar el archivo
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(response));
+                element.setAttribute('download', 'items_export_' + new Date().toISOString().slice(0,10) + '.csv');
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            },
+            error: function(xhr, status, error) {
+                alert('Error al exportar los datos: ' + error);
+            }
+        });
     });
 
     <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
@@ -71,6 +103,10 @@ $(document).ready(function()
 		</p>
 		<!-- End Pinto 08/04/2024 -->	
 <div id="title_bar" class="btn-toolbar print_hide">
+    <button class='btn btn-info btn-sm pull-right' data-href='<?php echo site_url("$controller_name/export_all"); ?>'
+            title='<?php echo $this->lang->line('items_export_all_items'); ?>'>
+        <span class="glyphicon glyphicon-export">&nbsp;</span><?php echo $this->lang->line('common_export_all'); ?>
+    </button>
     <button class='btn btn-info btn-sm pull-right modal-dlg' data-btn-submit='<?php echo $this->lang->line('common_submit') ?>' data-href='<?php echo site_url("$controller_name/csv_import"); ?>'
             title='<?php echo $this->lang->line('items_import_items_csv'); ?>'>
         <span class="glyphicon glyphicon-import">&nbsp;</span><?php echo $this->lang->line('common_import_csv'); ?>

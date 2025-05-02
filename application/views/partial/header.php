@@ -95,6 +95,24 @@
 		html {
 			overflow: auto;
 		}
+		.text-success {
+			color: #28a745;
+		}
+		.text-danger {
+			color: #dc3545;
+		}
+		.ui-autocomplete {
+			max-height: 300px;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+		.ui-autocomplete .ui-menu-item {
+			padding: 5px;
+			border-bottom: 1px solid #eee;
+		}
+		.ui-autocomplete .ui-menu-item:last-child {
+			border-bottom: none;
+		}
 	</style>
 </head>
 
@@ -128,7 +146,7 @@
 						<span class="icon-bar"></span>
 					</button>
 
-					<a class="navbar-brand hidden-sm" href="<?php echo site_url(); ?>">OSPOS</a>
+					<a class="navbar-brand hidden-sm" href="<?php echo site_url(); ?>">NEXTIENDA</a>
 				</div>
 
 				<div class="navbar-collapse collapse">

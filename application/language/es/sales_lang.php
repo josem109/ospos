@@ -151,6 +151,7 @@ $lang["sales_nontaxed_ind"] = " Ventas no gravadas ";
 $lang["sales_not_authorized"] = "Esta accion no esta autorizada.";
 $lang["sales_one_or_multiple"] = "venta(s)";
 $lang["sales_payment"] = "Tipo de Pago";
+$lang["sales_payment_added_successfully"] = "Pago agregado correctamente";
 $lang["sales_payment_amount"] = "Cantidad";
 $lang["sales_payment_debt_amount"] = "Abono";
 $lang["sales_payment_not_cover_total"] = "La Cantidad Recibida no cubre el pago total.";

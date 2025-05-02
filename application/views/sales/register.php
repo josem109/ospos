@@ -916,7 +916,7 @@ $(document).ready(function()
 		$(this).val("<?php echo $this->lang->line('sales_start_typing_item_name'); ?>");
 	});
 
-	$('#item').autocomplete( {
+	$('#item').autocomplete({
 		source: "<?php echo site_url($controller_name . '/item_search'); ?>",
 		minChars: 0,
 		autoFocus: false,
@@ -926,7 +926,11 @@ $(document).ready(function()
 			$('#add_item_form').submit();
 			return false;
 		}
-	});
+	}).data("ui-autocomplete")._renderItem = function(ul, item) {
+		return $("<li>")
+			.append("<div>" + item.label + "</div>")
+			.appendTo(ul);
+	};
 
 	$('#item').keypress(function (e) {
 		if(e.which == 13) {

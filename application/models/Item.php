@@ -550,90 +550,113 @@ class Item extends CI_Model
 		$suggestions = [];
 		$non_kit = array(ITEM, ITEM_AMOUNT_ENTRY);
 
-		$this->db->select($this->get_search_suggestion_format('item_id, name, pack_name'));
-		$this->db->from('items');
-		$this->db->where('deleted', $filters['is_deleted']);
-		$this->db->where_in('item_type', $non_kit); // standard, exclude kit items since kits will be picked up later
-		$this->db->like('name', $search);
-		$this->db->order_by('name', 'asc');
-		foreach($this->db->get()->result() as $row)
-		{
-			$suggestions[] = array('value' => $row->item_id, 'label' => $this->get_search_suggestion_label($row));
+		// Búsqueda por nombre
+		$this->db->select($this->get_search_suggestion_format('ospos_items.item_id, ospos_items.name, ospos_items.pack_name'));
+		$this->db->select('COALESCE(ospos_item_quantities.quantity, 0) as stock_quantity');
+		$this->db->select('CASE WHEN COALESCE(ospos_item_quantities.quantity, 0) > 0 THEN 1 ELSE 0 END as has_stock');
+		$this->db->from('ospos_items');
+		$this->db->join('ospos_item_quantities', 'ospos_item_quantities.item_id = ospos_items.item_id', 'left');
+		$this->db->where('ospos_items.deleted', $filters['is_deleted']);
+		$this->db->where_in('ospos_items.item_type', $non_kit);
+		$this->db->like('ospos_items.name', $search);
+		$this->db->order_by('CASE WHEN COALESCE(ospos_item_quantities.quantity, 0) > 0 THEN 1 ELSE 0 END DESC, LOWER(ospos_items.name) ASC');
+		
+		$query = $this->db->get();
+		
+		if($query && $query->num_rows() > 0) {
+			foreach($query->result() as $row) {
+				$suggestions[] = array(
+					'value' => $row->item_id,
+					'label' => $this->get_search_suggestion_label($row) . ' - Stock: ' . $row->stock_quantity,
+					'has_stock' => ($row->stock_quantity > 0)
+				);
+			}
 		}
 
-		$this->db->select($this->get_search_suggestion_format('item_id, item_number, pack_name'));
-		$this->db->from('items');
-		$this->db->where('deleted', $filters['is_deleted']);
-		$this->db->where_in('item_type', $non_kit); // standard, exclude kit items since kits will be picked up later
-		$this->db->like('item_number', $search);
-		$this->db->order_by('item_number', 'asc');
-		foreach($this->db->get()->result() as $row)
-		{
-			$suggestions[] = array('value' => $row->item_id, 'label' => $this->get_search_suggestion_label($row));
+		// Búsqueda por número de item
+		$this->db->select($this->get_search_suggestion_format('ospos_items.item_id, ospos_items.item_number, ospos_items.pack_name'));
+		$this->db->select('COALESCE(ospos_item_quantities.quantity, 0) as stock_quantity');
+		$this->db->select('CASE WHEN COALESCE(ospos_item_quantities.quantity, 0) > 0 THEN 1 ELSE 0 END as has_stock');
+		$this->db->from('ospos_items');
+		$this->db->join('ospos_item_quantities', 'ospos_item_quantities.item_id = ospos_items.item_id', 'left');
+		$this->db->where('ospos_items.deleted', $filters['is_deleted']);
+		$this->db->where_in('ospos_items.item_type', $non_kit);
+		$this->db->like('ospos_items.item_number', $search);
+		$this->db->order_by('CASE WHEN COALESCE(ospos_item_quantities.quantity, 0) > 0 THEN 1 ELSE 0 END DESC, LOWER(ospos_items.name) ASC');
+		
+		$query = $this->db->get();
+		
+		if($query && $query->num_rows() > 0) {
+			foreach($query->result() as $row) {
+				$suggestions[] = array(
+					'value' => $row->item_id,
+					'label' => $this->get_search_suggestion_label($row) . ' - Stock: ' . $row->stock_quantity,
+					'has_stock' => ($row->stock_quantity > 0)
+				);
+			}
 		}
 
-		if(!$unique)
-		{
-			//Search by category
+		if(!$unique) {
+			// Búsqueda por categoría
 			$this->db->select('category');
-			$this->db->from('items');
+			$this->db->from('ospos_items');
 			$this->db->where('deleted', $filters['is_deleted']);
 			$this->db->distinct();
 			$this->db->like('category', $search);
-			$this->db->order_by('category', 'asc');
-			foreach($this->db->get()->result() as $row)
-			{
-				$suggestions[] = array('label' => $row->category);
-			}
-
-			//Search by supplier
-			$this->db->select('company_name');
-			$this->db->from('suppliers');
-			$this->db->like('company_name', $search);
-			// restrict to non deleted companies only if is_deleted is FALSE
-			$this->db->where('deleted', $filters['is_deleted']);
-			$this->db->distinct();
-			$this->db->order_by('company_name', 'asc');
-			foreach($this->db->get()->result() as $row)
-			{
-				$suggestions[] = array('label' => $row->company_name);
-			}
-
-			//Search by description
-			$this->db->select($this->get_search_suggestion_format('item_id, name, pack_name, description'));
-			$this->db->from('items');
-			$this->db->where('deleted', $filters['is_deleted']);
-			$this->db->like('description', $search);
-			$this->db->order_by('description', 'asc');
-			foreach($this->db->get()->result() as $row)
-			{
-				$entry = array('value' => $row->item_id, 'label' => $this->get_search_suggestion_label($row));
-				if(!array_walk($suggestions, function($value, $label) use ($entry) { return $entry['label'] != $label; } ))
-				{
-					$suggestions[] = $entry;
+			$this->db->order_by('LOWER(category)', 'asc');
+			
+			$query = $this->db->get();
+			
+			if($query && $query->num_rows() > 0) {
+				foreach($query->result() as $row) {
+					$suggestions[] = array('label' => $row->category);
 				}
 			}
 
-			//Search by custom fields
-			if($filters['search_custom'] !== FALSE)
-			{
-				$this->db->join('attribute_values', 'attribute_links.attribute_id = attribute_values.attribute_id');
-				$this->db->join('attribute_definitions', 'attribute_definitions.definition_id = attribute_links.definition_id');
-				$this->db->like('attribute_value', $search);
-				$this->db->where('definition_type', TEXT);
-				$this->db->where('deleted', $filters['is_deleted']);
-				$this->db->where_in('item_type', $non_kit); // standard, exclude kit items since kits will be picked up later
+			// Búsqueda por proveedor
+			$this->db->select('company_name');
+			$this->db->from('ospos_suppliers');
+			$this->db->like('company_name', $search);
+			$this->db->where('deleted', $filters['is_deleted']);
+			$this->db->distinct();
+			$this->db->order_by('LOWER(company_name)', 'asc');
+			
+			$query = $this->db->get();
+			
+			if($query && $query->num_rows() > 0) {
+				foreach($query->result() as $row) {
+					$suggestions[] = array('label' => $row->company_name);
+				}
+			}
 
-				foreach($this->db->get('attribute_links')->result() as $row)
-				{
-					$suggestions[] = array('value' => $row->item_id, 'label' => $this->get_search_suggestion_label($row));
+			// Búsqueda por descripción
+			$this->db->select($this->get_search_suggestion_format('ospos_items.item_id, ospos_items.name, ospos_items.pack_name, ospos_items.description'));
+			$this->db->select('COALESCE(ospos_item_quantities.quantity, 0) as stock_quantity');
+			$this->db->select('CASE WHEN COALESCE(ospos_item_quantities.quantity, 0) > 0 THEN 1 ELSE 0 END as has_stock');
+			$this->db->from('ospos_items');
+			$this->db->join('ospos_item_quantities', 'ospos_item_quantities.item_id = ospos_items.item_id', 'left');
+			$this->db->where('ospos_items.deleted', $filters['is_deleted']);
+			$this->db->like('ospos_items.description', $search);
+			$this->db->order_by('CASE WHEN COALESCE(ospos_item_quantities.quantity, 0) > 0 THEN 1 ELSE 0 END DESC, LOWER(ospos_items.name) ASC');
+			
+			$query = $this->db->get();
+			
+			if($query && $query->num_rows() > 0) {
+				foreach($query->result() as $row) {
+					$entry = array(
+						'value' => $row->item_id,
+						'label' => $this->get_search_suggestion_label($row) . ' - Stock: ' . $row->stock_quantity,
+						'has_stock' => ($row->stock_quantity > 0)
+					);
+					if(!array_walk($suggestions, function($value, $label) use ($entry) { return $entry['label'] != $label; } )) {
+						$suggestions[] = $entry;
+					}
 				}
 			}
 		}
 
-		//only return $limit suggestions
-		if(count($suggestions) > $limit)
-		{
+		// Limitar el número de sugerencias
+		if(count($suggestions) > $limit) {
 			$suggestions = array_slice($suggestions, 0, $limit);
 		}
 
@@ -985,6 +1008,65 @@ class Item extends CI_Model
 			
 		}
 		return 'item_name';
+	}
+
+	/**
+	 * Obtiene todos los items para exportación, incluyendo información de impuestos y categorías
+	 * 
+	 * @param array $filters Filtros a aplicar
+	 * @return object Resultado de la consulta
+	 */
+	public function get_all_for_export($filters)
+	{
+		$this->db->select('items.*');
+		$this->db->select('MAX(suppliers.company_name) AS company_name');
+		$this->db->select('MAX(item_quantities.quantity) AS quantity');
+		
+		$this->db->from('items AS items');
+		$this->db->join('suppliers AS suppliers', 'suppliers.person_id = items.supplier_id', 'left');
+		$this->db->join('item_quantities AS item_quantities', 'item_quantities.item_id = items.item_id', 'left');
+		
+		if($filters['stock_location_id'] > -1)
+		{
+			$this->db->where('item_quantities.location_id', $filters['stock_location_id']);
+		}
+
+		// Aplicar filtros adicionales
+		if($filters['empty_upc'] != FALSE)
+		{
+			$this->db->where('item_number', NULL);
+		}
+		if($filters['low_inventory'] != FALSE)
+		{
+			$this->db->where('quantity <=', 'reorder_level');
+		}
+		if($filters['is_serialized'] != FALSE)
+		{
+			$this->db->where('is_serialized', 1);
+		}
+		if($filters['no_description'] != FALSE)
+		{
+			$this->db->where('items.description', '');
+		}
+		if($filters['temporary'] != FALSE)
+		{
+			$this->db->where('items.item_type', ITEM_TEMP);
+		}
+		else
+		{
+			$non_temp = array(ITEM, ITEM_KIT, ITEM_AMOUNT_ENTRY);
+			$this->db->where_in('items.item_type', $non_temp);
+		}
+
+		$this->db->where('items.deleted', $filters['is_deleted']);
+
+		// Agrupar por item_id para evitar duplicados
+		$this->db->group_by('items.item_id');
+
+		// Ordenar por nombre
+		$this->db->order_by('items.name', 'asc');
+
+		return $this->db->get();
 	}
 }
 ?>

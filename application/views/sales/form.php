@@ -133,52 +133,95 @@
 			</div>
 		</div>
 
-		<div class="form-group form-group-sm">
-			<?php echo form_label($this->lang->line('sales_payment_debt_amount'), 'employee', array('class'=>'control-label col-xs-3')); ?>
-			<div class='col-xs-6'>
-				<?php echo form_input(array(
-					'name'=>'sales_payment_amount', 
-					'value'=>$payment_amount, 
-					'id'=>'payment_amount', 
-					'class'=>'form-control input-sm', 
-					'size'=>'8', // Ajuste del ancho del campo
-					'width'=>'30'
-				));?>
-				<?php echo form_hidden('payment_amount', $payment_amount);?>
-				
-			</div>
-			<div class='col-xs-2'>
-				<span class="input-group-btn">
-					<button class="btn btn-default btn-sm" type="button" id="add_payment_button" style="background: transparent; border: none;">
-						<span class="glyphicon glyphicon-plus" style="color: #18bc9c;"></span>
-					</button>
-            	</span>
-			</div>	
-		</div>
-		<table class="table table-bordered table-striped table-condensed" id="payment_abonos_table">
-			<thead>
-				<tr>
-					<th>ID</th>
-					<th>Fecha Abono</th>
-					<th>Monto</th>
-					<th>Reportado por</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>1</td>
-					<td>2024-12-01</td>
-					<td>100.00</td>
-					<td>admin</td>
-				</tr>
-				<tr>
-					<td>2</td>
-					<td>2024-12-05</td>
-					<td>200.00</td>
-					<td>admin</td>
-				</tr>
-			</tbody>
-		</table>
+		<?php
+		$has_adeudado = false;
+		if(isset($payments)) {
+			foreach($payments as $payment) {
+				if($payment->payment_type === "Adeudado") {
+					$has_adeudado = true;
+					break;
+				}
+			}
+		}
+		?>
+
+		<?php if($show_payment_section): ?>
+			<?php if($has_adeudado): ?>
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('sales_payment_debt_amount'), 'employee', array('class'=>'control-label col-xs-3')); ?>
+					<div class='col-xs-4'>
+						<?php 
+						// Obtener el monto adeudado actual
+						$adeudado_amount = 0;
+						foreach($payments as $payment) {
+							if($payment->payment_type === "Adeudado") {
+								$adeudado_amount = $payment->payment_amount;
+								break;
+							}
+						}
+						?>
+						<?php echo form_input(array(
+							'name'=>'sales_payment_amount', 
+							'value'=>$payment_amount, 
+							'id'=>'payment_amount', 
+							'class'=>'form-control input-sm', 
+							'size'=>'8',
+							'width'=>'30'
+						));?>
+						<?php echo form_hidden('payment_amount', $adeudado_amount);?>
+					</div>
+					<div class='col-xs-3'>
+						<?php echo form_dropdown('payment_type_abono', $payment_options, '', array('id'=>'payment_type_abono', 'class'=>'form-control input-sm')); ?>
+					</div>
+					<div class='col-xs-2'>
+						<span class="input-group-btn">
+							<button class="btn btn-default btn-sm" type="button" id="add_payment_button" style="background: transparent; border: none;">
+								<span class="glyphicon glyphicon-plus" style="color: #18bc9c;"></span>
+							</button>
+						</span>
+					</div>  
+				</div>
+			<?php endif; ?>
+
+			<table class="table table-bordered table-striped table-condensed" id="payment_abonos_table">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Fecha Abono</th>
+						<th>Monto</th>
+						<th>Tipo de Pago</th>
+						<th>Reportado por</th>
+						<?php if($this->session->userdata('role') == 'admin'): ?>
+						<th><span class="glyphicon glyphicon-cog"></span></th>
+						<?php endif; ?>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if(isset($payment_history) && !empty($payment_history)): ?>
+						<?php foreach($payment_history as $payment): ?>
+							<tr>
+								<td><?php echo $payment['payment_id']; ?></td>
+								<td><?php echo date('d/m/Y', strtotime($payment['payment_date'])); ?></td>
+								<td><?php echo to_currency($payment['payment_amount']); ?></td>
+								<td><?php echo $payment['payment_type']; ?></td>
+								<td><?php echo $payment['employee_name']; ?></td>
+								<?php if($this->session->userdata('role') == 'admin'): ?>
+								<td>
+									<a href="javascript:void(0);" class="delete-payment" data-payment-id="<?php echo $payment['payment_id']; ?>">
+										<span class="glyphicon glyphicon-trash" style="color: #e74c3c;"></span>
+									</a>
+								</td>
+								<?php endif; ?>
+							</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+					<tr id="no_payments_row" class="<?php echo (isset($payment_history) && !empty($payment_history)) ? 'hidden' : ''; ?>">
+						<td colspan="<?php echo ($this->session->userdata('role') == 'admin') ? '6' : '5'; ?>" style="text-align: center;">No hay pagos registrados</td>
+					</tr>
+				</tbody>
+			</table>
+		<?php endif; ?>
+
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('sales_comment'), 'comment', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
@@ -291,40 +334,197 @@ $(document).ready(function()
 		}
 	}, form_support.error));
 
+	// Definir el patrón regex para validar el formato de moneda
+	var currencyRegex = /^\d+(\.\d{1,2})?$/;
+
+	// Agregar esta función justo antes del código de add_payment_button
+	function forceCloseModal() {
+		// 1. Eliminar completamente el modal y el backdrop
+		$('.modal').remove();
+		$('.modal-backdrop').remove();
+		
+		// 2. Restaurar el estado del body
+		$('body')
+			.removeClass('modal-open')
+			.css({
+				'padding-right': '',
+				'overflow': ''
+			});
+		
+		// 3. Forzar cualquier otro cambio en el documento
+		$(document).off('focusin.modal'); // Quitar cualquier evento modal
+	}
+
 	$('#add_payment_button').click(function() {
-        var pAmount = $('#payment_amount').val().trim();
-        
-        // 1. Validar que no esté vacío
-        if (pAmount === '') {
-            alert('Debe ingresar un monto para abonar a esta factura');
-            return;
-        }
+		var pAmount = $('#payment_amount').val().trim();
+		var pType = $('#payment_type_abono').val();
+		
+		// Actualizar las validaciones iniciales
+		if (pAmount === '') {
+			showNotification('Debe ingresar un monto para abonar a esta factura');
+			return;
+		}
 
-        // 2. Validar el formato ##.## (numérico con opcional hasta 2 decimales)
-        var currencyRegex = /^\d+(\.\d{1,2})?$/;
-        if (!currencyRegex.test(pAmount)) {
-            alert('Debe ingresar un abono con el formato correcto, el formato correcto debe ser ##.##');
-            return;
-        }
+		if (!currencyRegex.test(pAmount)) {
+			showNotification('Debe ingresar un abono con el formato correcto, el formato correcto debe ser ##.##');
+			return;
+		}
 
-        // 3. Si pasa las validaciones, agregar la fila a la tabla
-        var today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        // Asignamos un ID ficticio, por ejemplo el siguiente registro sería 3.
-        // Podrías implementarlo para que se calcule dinámicamente.
-        var newId = 3;
+		if (pType === '') {
+			showNotification('Debe seleccionar un tipo de pago');
+			return;
+		}
 
-        $('#payment_abonos_table tbody').append(
-            '<tr>' +
-                '<td>' + newId + '</td>' +
-                '<td>' + today + '</td>' +
-                '<td>' + pAmount + '</td>' +
-                '<td>admin</td>' +
-            '</tr>'
-        );
+		// Validación del monto adeudado...
+		var adeudadoAmount = parseFloat($('input[name="payment_amount"]').val());
+		var paymentAmount = parseFloat(pAmount);
 
-        // Opcionalmente, podrías limpiar el campo después de agregar el registro:
-        $('#payment_amount').val('');
-    });
+		if (paymentAmount > adeudadoAmount.toFixed(2)) {
+			showNotification('1El monto del pago no puede ser mayor que el monto adeudado (' + adeudadoAmount.toFixed(2) + ')');
+			return;
+		}
+
+		// Llamada AJAX
+		$.ajax({
+			url: '<?php echo site_url("sales/add_payment_to_sale"); ?>',
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				sale_id: <?php echo $sale_info['sale_id']; ?>,
+				payment_amount: pAmount,
+				payment_type: pType
+			},
+			success: function(response) {
+				if (response.success) {
+					// Mostrar mensaje de éxito
+					showNotification(response.message, 'success');
+
+					// Actualizar el monto adeudado restante
+					var newAdeudado = adeudadoAmount - paymentAmount;
+
+					// Si el adeudado llega a 0
+					if (newAdeudado <= 0) {
+						// Actualizar la tabla primero
+						table_support.handle_submit('<?php echo site_url($controller_name); ?>', response);
+						
+						// Usar nuestra función personalizada para cerrar con fuerza el modal
+						forceCloseModal();
+						
+						// Actualizar el resumen de pagos
+						const params = $.param(table_support.query_params());
+						$.get('<?php echo site_url($controller_name); ?>/search?' + params, function(response) {
+							$('#payment_summary').html(response.payment_summary);
+						}, 'json');
+					} else {
+						// Pago parcial - Aquí está ocurriendo el problema con el overlay
+						
+						// Primero ocultamos el modal y el overlay actual
+						$('.modal').modal('hide');
+						$('.modal-backdrop').remove();
+						$('body').removeClass('modal-open').css('padding-right', '');
+						
+						// Actualizar la tabla principal primero (igual que en el caso de pago completo)
+						table_support.handle_submit('<?php echo site_url($controller_name); ?>', response);
+						
+						// Breve retraso para permitir que el DOM se actualice
+						setTimeout(function() {
+							// Actualizar el resumen de pagos en la vista principal
+							const params = $.param(table_support.query_params());
+							$.get('<?php echo site_url($controller_name); ?>/search?' + params, function(response) {
+								$('#payment_summary').html(response.payment_summary);
+								
+								// Luego recargamos el contenido en un nuevo modal
+								dialog_support.fetch('<?php echo site_url("sales/view"); ?>/' + <?php echo $sale_info['sale_id']; ?>);
+							}, 'json');
+						}, 300);
+					}
+				} else {
+					// Mostrar mensaje de error
+					showNotification(response.message);
+				}
+			},
+			error: function() {
+				// Aplicar la misma configuración para errores de AJAX
+				showNotification('Error al procesar el pago');
+			}
+		});
+	});
+
+	// Agregar esta función al inicio del script (después de $(document).ready)
+	function showNotification(message, type) {
+		$.notify(message, {
+			type: type || 'danger',
+			placement: {
+				from: 'top',
+				align: 'center'
+			},
+			z_index: 9999,
+			animate: {
+				enter: 'animated fadeInDown',
+				exit: 'animated fadeOutUp'
+			},
+			delay: 3000,
+			offset: {
+				y: 80
+			},
+			template: 
+				'<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" style="max-width: 400px; text-align: center;">' +
+				'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">&times;</button>' +
+				'<span data-notify="message">{2}</span>' +
+				'</div>'
+		});
+	}
+
+	// Manejador para eliminar pagos
+	$('#payment_abonos_table').on('click', '.delete-payment', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var paymentId = $(this).data('payment-id');
+		var row = $(this).closest('tr');
+		
+		// Mostrar diálogo de confirmación
+		if(confirm('¿Está seguro que desea eliminar este pago?')) {
+			$.ajax({
+				url: '<?php echo site_url("sales/delete_payment_history"); ?>/' + paymentId,
+				type: 'POST',
+				dataType: 'json',
+				success: function(response) {
+					if(response.success) {
+						// Eliminar la fila de la tabla
+						row.remove();
+						
+						// Verificar si quedan filas en la tabla
+						if($('#payment_abonos_table tbody tr').length <= 1) { // Solo queda la fila de "No hay pagos"
+							$('#no_payments_row').removeClass('hidden');
+						}
+						
+						// Mostrar mensaje de éxito
+						showNotification(response.message, 'success');
+						
+						// Recargar la página para actualizar los montos
+						setTimeout(function() {
+							window.location.reload();
+						}, 1500);
+					} else {
+						// Mostrar mensaje de error
+						showNotification(response.message);
+					}
+				},
+				error: function() {
+					showNotification('Error al procesar la solicitud');
+				}
+			});
+		}
+	});
+
+	function formatDate(dateString) {
+		var date = new Date(dateString);
+		var day = date.getDate().toString().padStart(2, '0');
+		var month = (date.getMonth() + 1).toString().padStart(2, '0');
+		var year = date.getFullYear();
+		return day + '/' + month + '/' + year;
+	}
 
 });
 </script>
