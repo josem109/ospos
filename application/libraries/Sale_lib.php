@@ -503,15 +503,18 @@ class Sale_lib
 			//$discount_amount_ves = $this->get_item_discount($item['quantity'], $item['price'] * $currency_rate_alternative, $item['discount'], $item['discount_type'], $currency_rate, $currency_rate_alternative);
 			$total_discount = bcadd($total_discount, $discount_amount);
 
-			$extended_amount = $this->get_extended_amount($item['quantity'], $item['price_ves'] * $currency_rate_alternative / $currency_rate);
+			// Pinto: Apply rounding to USD price calculation to match visual display
+			$usd_price_rounded = round(($item['price_ves'] * $currency_rate_alternative) / $currency_rate, 2);
+			$extended_amount = $this->get_extended_amount($item['quantity'], $usd_price_rounded);
 			//$extended_amount = $this->get_extended_amount($item['quantity'], $item['price_ves']);
 			if ($item['discount'] == 0)
 			{
+				// Pinto: Calculate Bs amount directly from base price * alternative rate to avoid precision errors
 				$extended_discounted_amount_ves = $item['quantity'] * $item['price_ves'] * $currency_rate_alternative;
 			}else {
 				$extended_discounted_amount_ves = $item["discounted_total"] * $currency_rate;
 			}
-			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], ($item['price_ves'] * $currency_rate_alternative) / $currency_rate, $discount_amount);
+			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], $usd_price_rounded, $discount_amount);
 			
 			$prediscount_subtotal= bcadd($prediscount_subtotal, $extended_amount);
 			$total = bcadd($total, $extended_discounted_amount);
@@ -1325,10 +1328,9 @@ class Sale_lib
 	public function get_item_total($quantity, $price, $discount, $discount_type, $include_discount = FALSE, $currency_rate = 1.0, $currency_rate_alternative = 1.0)
 	{
 		$total = bcmul($quantity, $price);
-		$total = $total * $currency_rate_alternative / $currency_rate;
 		if($include_discount)
 		{
-			$discount_amount = $this->get_item_discount($quantity, $price, $discount, $discount_type);
+			$discount_amount = $this->get_item_discount($quantity, $price, $discount, $discount_type, $currency_rate, $currency_rate_alternative);
 
 			return bcsub($total, $discount_amount);
 		}

@@ -599,7 +599,12 @@ if(isset($success))
 			<table class="sales_table_100" id="payment_totals">
 				<tr>
 					<th style="width: 55%;"><?php echo $this->lang->line('sales_payments_total'); ?></th>
-					<th style="width: 45%; text-align: right;"><?php echo to_currency($payments_total); ?></th>
+					<th style="width: 45%; text-align: right;">
+						<?php
+						 //$payments_total = round($payments_total, 2);
+						 echo to_currency($payments_total);
+						 ?>
+					</th>
 				</tr>
 				<tr>
 					<th style="width: 55%; font-size: 120%"><?php echo $this->lang->line('sales_amount_due'); ?></th>
