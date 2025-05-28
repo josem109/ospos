@@ -369,8 +369,12 @@ class Sales extends Secure_Controller
 				$amount_due_ves = $amount_due * $currency_rate;
 				$sales_total = $this->sale_lib->get_total(FALSE, $currency_rate, $currency_rate_alternative);
 				$amount_tendered = $this->input->post('amount_tendered');
-				$amount_tendered_ves = $amount_tendered;
-				$amount_tendered = $amount_tendered  / $currency_rate;
+				$amount_tendered_ves = $this->input->post('amount_tendered_ves');
+				
+				//$amount_tendered_ves = $amount_tendered;
+				//$amount_tendered = $amount_tendered  / $currency_rate;
+				// Redondear a 2 decimales para coherencia visual y lógica
+				$amount_tendered = round($amount_tendered, 2);
 				//$amount_tendered = ceil($amount_tendered * 100) / 100;
 				$this->sale_lib->add_payment($payment_type, $amount_tendered);
 				$cash_adjustment_amount = $amount_due - $sales_total;

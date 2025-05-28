@@ -500,28 +500,26 @@ class Sale_lib
 				$total_units += $item['quantity'];
 			}
 			$discount_amount = $this->get_item_discount($item['quantity'], $item['price'], $item['discount'], $item['discount_type'], $currency_rate, $currency_rate_alternative);
-			//$discount_amount_ves = $this->get_item_discount($item['quantity'], $item['price'] * $currency_rate_alternative, $item['discount'], $item['discount_type'], $currency_rate, $currency_rate_alternative);
 			$total_discount = bcadd($total_discount, $discount_amount);
 
-			// Pinto: Apply rounding to USD price calculation to match visual display
+			// Calcular el precio unitario redondeado a 2 decimales
 			$usd_price_rounded = round(($item['price_ves'] * $currency_rate_alternative) / $currency_rate, 2);
-			$extended_amount = $this->get_extended_amount($item['quantity'], $usd_price_rounded);
-			//$extended_amount = $this->get_extended_amount($item['quantity'], $item['price_ves']);
+			// Sumar el total USD como suma de precios redondeados por unidad * cantidad
+			$extended_amount = $usd_price_rounded * $item['quantity'];
+			$total = bcadd($total, $extended_amount);
+
+			// El resto de totales (Bs) y subtotales pueden quedarse igual
 			if ($item['discount'] == 0)
 			{
-				// Pinto: Calculate Bs amount directly from base price * alternative rate to avoid precision errors
 				$extended_discounted_amount_ves = $item['quantity'] * $item['price_ves'] * $currency_rate_alternative;
 			}else {
 				$extended_discounted_amount_ves = $item["discounted_total"] * $currency_rate;
 			}
 			$extended_discounted_amount = $this->get_extended_amount($item['quantity'], $usd_price_rounded, $discount_amount);
-			
 			$prediscount_subtotal= bcadd($prediscount_subtotal, $extended_amount);
-			$total = bcadd($total, $extended_discounted_amount);
 			$total2 = bcadd($total2, $extended_discounted_amount_ves);
 			$subtotal = bcadd($subtotal, $extended_discounted_amount);
 			$subtotal2 = bcadd($subtotal2, $extended_discounted_amount_ves);
-			//$subtotal = $subtotal * $currency_rate;
 		}
 
 		$totals['prediscount_subtotal'] = $prediscount_subtotal;
@@ -1360,10 +1358,12 @@ class Sale_lib
 
 	public function get_item_discount($quantity, $price, $discount, $discount_type, $currency_rate = 1.0, $currency_rate_alternative = 1.0)
 	{
+		//jose pinto 27-05-2025
+		$price = round($price * $currency_rate_alternative / $currency_rate, 2);
 		$total = bcmul($quantity, $price);
 		if($discount_type == PERCENT)
 		{
-			$total = ($total * $currency_rate_alternative) / $currency_rate;
+			//$total = ($total * $currency_rate_alternative) / $currency_rate;
 			$discount = bcmul($total, bcdiv($discount, 100));
 		}
 		else

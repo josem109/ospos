@@ -642,7 +642,7 @@ if(isset($success))
 							<tr>
 								<td><span id="amount_tendered_label_ves"><?php echo $this->lang->line('sales_amount_tendered_ves'); ?></span></td>
 								<td>
-									<?php echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered_ves', 'class'=>'form-control input-sm disabled', 'disabled'=>'disabled', 'value'=>'0', 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
+									<?php echo form_input(array('name'=>'amount_tendered_ves', 'id'=>'amount_tendered_ves', 'class'=>'form-control input-sm disabled', 'disabled'=>'disabled', 'value'=>'0', 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
 								</td>
 							</tr>
 				 <!-- Pinto 06/06/2024-->
@@ -698,7 +698,7 @@ if(isset($success))
 							<tr>
 								<td><span id="amount_tendered_label_ves"><?php echo $this->lang->line('sales_amount_tendered_ves'); ?></span></td>
 								<td>
-									<?php echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered_ves', 'class'=>'form-control input-sm non-giftcard-input', 'value'=>to_currency_no_money($amount_due_ves), 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
+									<?php echo form_input(array('name'=>'amount_tendered_ves', 'id'=>'amount_tendered_ves', 'class'=>'form-control input-sm non-giftcard-input', 'value'=>to_currency_no_money($amount_due_ves), 'size'=>'5', 'tabindex'=>++$tabindex, 'onClick'=>'this.select();')); ?>
 									<?php //echo form_input(array('name'=>'amount_tendered', 'id'=>'amount_tendered', 'class'=>'form-control input-sm giftcard-input', 'disabled' => true, 'value'=>to_currency_no_money($amount_due), 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
 								</td>
 							</tr>
